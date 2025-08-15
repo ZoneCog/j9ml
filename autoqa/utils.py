@@ -286,10 +286,11 @@ def start_jan_app(jan_app_path=None):
         logger.error(f"Error starting Jan application: {e}")
         raise
 
-def scan_test_files(tests_dir="tests"):
+def scan_test_files(tests_dir="tests/base"):
     """
     Scan tests folder and find all .txt files
     Returns list with format [{'path': 'relative_path', 'prompt': 'file_content'}]
+    Note: Default changed to tests/base for current version testing
     """
     test_files = []
     tests_path = Path(tests_dir)
