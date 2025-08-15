@@ -114,46 +114,103 @@ def extract_test_result_from_trajectory(trajectory_dir):
         
         logger.info(f"Checking result in last turn: {last_turn}")
         
-        # Look for API call response files
+        # Look for agent response files first (preferred), then fall back to response files
+        agent_response_files = [f for f in os.listdir(last_turn_path) 
+                               if f.startswith("api_call_") and f.endswith("_agent_response.json")]
         response_files = [f for f in os.listdir(last_turn_path) 
                          if f.startswith("api_call_") and f.endswith("_response.json")]
         
-        if not response_files:
+        # Prefer agent_response files, but fall back to response files if needed
+        if agent_response_files:
+            target_files = agent_response_files
+            file_type = "agent_response"
+        elif response_files:
+            target_files = response_files
+            file_type = "response"
+        else:
             logger.warning("No API response files found in last turn")
             return False
         
         # Check the last response file
-        last_response_file = sorted(response_files)[-1]
+        last_response_file = sorted(target_files)[-1]
         response_file_path = os.path.join(last_turn_path, last_response_file)
         
-        logger.info(f"Checking response file: {last_response_file}")
+        logger.info(f"Checking {file_type} file: {last_response_file}")
         
         with open(response_file_path, 'r', encoding='utf-8') as f:
             data = json.load(f)
         
-        # Extract content from response
-        if 'response' in data and 'choices' in data['response'] and data['response']['choices']:
-            last_choice = data['response']['choices'][-1]
-            if 'message' in last_choice and 'content' in last_choice['message']:
-                content = last_choice['message']['content']
-                logger.info(f"Last response content: {content}")
-                
-                # Look for result patterns - need to check both True and False
-                true_pattern = r'\{\s*"result"\s*:\s*True\s*\}'
-                false_pattern = r'\{\s*"result"\s*:\s*False\s*\}'
-                
-                true_match = re.search(true_pattern, content)
-                false_match = re.search(false_pattern, content)
-                
-                if true_match:
-                    logger.info(f"Found test result: True - PASSED")
-                    return True
-                elif false_match:
-                    logger.info(f"Found test result: False - FAILED")
-                    return False
-                else:
-                    logger.warning("No valid result pattern found in response content - marking as FAILED")
-                    return False
+        # Extract content from response - handle both agent_response and response formats
+        content = None
+        if file_type == "agent_response":
+            logger.info(f"Processing agent_response file with keys: {list(data.keys())}")
+            
+            # For agent_response.json: look in multiple possible locations
+            if 'response' in data and 'choices' in data['response'] and data['response']['choices']:
+                last_choice = data['response']['choices'][-1]
+                if 'message' in last_choice and 'content' in last_choice['message']:
+                    content = last_choice['message']['content']
+                    logger.info(f"Found content in response.choices[].message.content: {content}")
+            
+            # Also check in output array for message content - handle both direct and nested structures
+            output_array = None
+            if 'output' in data:
+                output_array = data['output']
+                logger.info(f"Found output array directly in data with {len(output_array)} items")
+            elif 'response' in data and isinstance(data['response'], dict) and 'output' in data['response']:
+                output_array = data['response']['output']
+                logger.info(f"Found output array in nested response with {len(output_array)} items")
+            
+            if not content and output_array:
+                for i, output_item in enumerate(output_array):
+                    logger.info(f"Output item {i}: type={output_item.get('type')}")
+                    if output_item.get('type') == 'message':
+                        message_content = output_item.get('content', [])
+                        logger.info(f"Found message with {len(message_content)} content items")
+                        for j, content_item in enumerate(message_content):
+                            logger.info(f"Content item {j}: type={content_item.get('type')}, text={content_item.get('text', '')}")
+                            if content_item.get('type') == 'output_text':
+                                potential_content = content_item.get('text', '')
+                                if 'result' in potential_content:
+                                    content = potential_content
+                                    logger.info(f"Found result content: {content}")
+                                    break
+                        if content:
+                            break
+            
+            if not content and not output_array:
+                logger.warning(f"No 'output' key found in data or nested response. Available keys: {list(data.keys())}")
+                if 'response' in data:
+                    logger.warning(f"Response keys: {list(data['response'].keys()) if isinstance(data['response'], dict) else 'Not a dict'}")
+        else:
+            # For response.json: look in choices[0].message.content
+            if 'response' in data and 'choices' in data['response'] and data['response']['choices']:
+                last_choice = data['response']['choices'][-1]
+                if 'message' in last_choice and 'content' in last_choice['message']:
+                    content = last_choice['message']['content']
+        
+        if content:
+            logger.info(f"Last {file_type} content: {content}")
+            
+            # Look for result patterns - need to check both True and False
+            # Updated patterns to handle additional JSON fields and both Python and JSON boolean values
+            true_pattern = r'\{\s*"result"\s*:\s*(true|True)\s*[,}]'
+            false_pattern = r'\{\s*"result"\s*:\s*(false|False)\s*[,}]'
+            
+            true_match = re.search(true_pattern, content)
+            false_match = re.search(false_pattern, content)
+            
+            if true_match:
+                logger.info(f"Found test result: True - PASSED")
+                return True
+            elif false_match:
+                logger.info(f"Found test result: False - FAILED")
+                return False
+            else:
+                logger.warning("No valid result pattern found in response content - marking as FAILED")
+                return False
+        else:
+            logger.warning(f"Could not extract content from {file_type} structure")
         
         logger.warning("Could not extract content from response structure")
         return False

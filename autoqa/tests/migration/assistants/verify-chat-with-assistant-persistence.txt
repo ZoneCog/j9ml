@@ -1,0 +1,37 @@
+You are verifying that a previously created chat thread with a custom assistant persists and functions correctly after upgrading the Jan application.
+
+PHASE: VERIFY CHAT THREAD (NEW VERSION)
+
+Step-by-step instructions:
+
+1. Open the Jan application (NEW version after upgrade).
+
+2. Verify that the previous chat thread still exists:
+   - Look in the **left sidebar** under the **Recents** section.
+   - Confirm that a thread exists with the title: `Hello world` (this is based on the initial message sent).
+   - Click on that thread to open it.
+
+3. Verify the assistant identity:
+   - In the opened thread, look at the top of the message from the assistant.
+   - Confirm it shows the assistant name: `Python Tutor`, along with the selected emoji next to it.
+   - Confirm that the assistant’s previous response is visible.
+
+4. Send a follow-up test message:
+   - Type: `Can you explain how for loops work in Python?` and press Enter.
+   - Wait for a complete response from the assistant.
+
+5. Verify correct behavior:
+
+CRITICAL INSTRUCTIONS FOR FINAL RESPONSE:
+- You MUST respond in English only, not any other language
+- You MUST return ONLY the JSON format below, nothing else
+- Do NOT add any explanations, thoughts, or additional text
+
+   - If the assistant responds clearly and informatively, maintaining the tutoring tone, and the thread identity (`Python Tutor`) is preserved, return:
+     {"result": true, "phase": "verification_complete"}
+   - If the thread is missing, the assistant identity is incorrect, or the assistant fails to respond, return:
+     {"result": false, "phase": "verification_failed"}
+
+IMPORTANT: 
+- Your response must be ONLY the JSON above
+- Do NOT add any other text before or after the JSON

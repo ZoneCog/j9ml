@@ -1,0 +1,48 @@
+You are verifying that custom assistants persist correctly after upgrading the Jan application.
+
+PHASE 2 - VERIFICATION (NEW VERSION):
+Step-by-step instructions for verifying assistant persistence in the NEW version:
+
+1. Open the Jan application (NEW version after upgrade).
+
+2. Verify that previously created assistants are preserved:
+   - In the bottom-left corner, click **Assistants**.
+   - Confirm that you see the following assistants in the list:
+     - Default assistant: `Jan`
+     - Custom assistant: `Python Tutor`
+     - Custom assistant: `Creative Writer`
+
+3. Verify the details of each assistant:
+
+   - Click on Edit (Pencil Icon) of `Python Tutor`:
+     - Confirm **Name**: `Python Tutor`
+     - Confirm **Description**: `A helpful Python programming tutor`
+     - Confirm **Instructions** contain:
+       ```
+       You are an expert Python tutor. Always explain concepts clearly with examples. Use encouraging language and provide step-by-step solutions.
+       ```
+
+   - Click on Edit (Pencil Icon) of `Creative Writer`:
+     - Confirm **Name**: `Creative Writer`
+     - Confirm **Description**: `A creative writing assistant for stories and poems`
+     - Confirm **Instructions** contain:
+       ```
+       You are a creative writing assistant. Help users write engaging stories, poems, and creative content. Be imaginative and inspiring.
+       ```
+
+4. Return the verification result:
+
+CRITICAL INSTRUCTIONS FOR FINAL RESPONSE:
+- You MUST respond in English only, not any other language
+- You MUST return ONLY the JSON format below, nothing else
+- Do NOT add any explanations, thoughts, or additional text
+
+If all custom assistants are preserved with correct settings and parameters, return EXACTLY:
+{"result": true, "phase": "verification_complete"}
+
+If any assistants are missing or have incorrect settings, return EXACTLY:
+{"result": false, "phase": "verification_failed"}
+
+IMPORTANT: 
+- Your response must be ONLY the JSON above
+- Do NOT add any other text before or after the JSON

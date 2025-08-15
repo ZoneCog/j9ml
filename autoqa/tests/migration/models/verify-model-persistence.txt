@@ -1,0 +1,39 @@
+prompt = """
+You are verifying that model downloads and settings persist after Jan application upgrade.
+
+PHASE 2 - VERIFICATION (NEW VERSION):
+Step-by-step instructions for NEW version verification:
+
+1. Given the Jan application is already opened (NEW version after upgrade).
+
+2. Verify models in Hub:
+   - Click the **Hub** menu in the bottom-left corner
+   - Look for the models that were downloaded: **jan-nano-gguf** and others
+   - Verify they show **Use** button instead of **Download** button
+   - Click the **Downloaded** filter toggle on the right
+   - Verify downloaded models appear in the filtered list
+   - Turn off the Downloaded filter
+
+3. Verify models are available in chat:
+   - Click **New Chat**
+   - Click on the model dropdown
+   - Verify downloaded models appear in the selectable list
+   - Select **jan-nano-gguf**
+   - Send: "Are you working correctly after the app upgrade?"
+   - Wait for response - should work normally
+
+4. Verify model provider settings:
+   - Go to **Settings** > **Model Providers**
+   - Click on **Llama.cpp** section (in the left sidebar, NOT the toggle)
+   - Verify downloaded models are listed in the Models section with correct names
+   - Check that any previously configured settings are preserved
+
+5. Test model management features:
+   - In the Models list, verify you can see model details
+   - Test that you can still start/stop models if applicable
+   - Verify model functionality is intact
+
+If all downloaded models are preserved, show correct status in Hub, work in chat, and model provider settings are maintained, return: {"result": True, "phase": "verification_complete"}, otherwise return: {"result": False, "phase": "verification_failed"}.
+
+In all your responses, use only plain ASCII characters. Do NOT use Unicode symbols.
+"""

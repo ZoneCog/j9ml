@@ -1,0 +1,53 @@
+You are testing custom assistants persistence across Jan application upgrade.
+
+PHASE 1 - SETUP (OLD VERSION):
+Step-by-step instructions for creating assistants in the OLD version:
+
+1. Open the Jan application (OLD version).
+
+2. Create the first assistant - Python Tutor:
+   - In the bottom-left corner, click **Assistants**.
+   - Click the **+** button to create a new assistant.
+   - In the **Add Assistant** modal:
+     - Select an emoji for the assistant.
+     - Set **Name**: `Python Tutor`
+     - Set **Description**: `A helpful Python programming tutor`
+     - Set **Instructions**:
+       ```
+       You are an expert Python tutor. Always explain concepts clearly with examples. Use encouraging language and provide step-by-step solutions.
+       ```
+     - Click **Save**.
+
+3. Create the second assistant - Creative Writer:
+   - Click the **+** button to create another assistant.
+   - In the **Add Assistant** modal:
+     - Select a different emoji.
+     - Set **Name**: `Creative Writer`
+     - Set **Description**: `A creative writing assistant for stories and poems`
+     - Set **Instructions**:
+       ```
+       You are a creative writing assistant. Help users write engaging stories, poems, and creative content. Be imaginative and inspiring.
+       ```
+     - Click **Save**.
+
+4. Verify both assistants appear in the list:
+   - Return to the **Assistants** section.
+   - Confirm you see both `Python Tutor` and `Creative Writer`.
+   - Confirm the names and descriptions are correctly displayed.
+
+5. Return the result in the exact JSON format:
+
+CRITICAL INSTRUCTIONS FOR FINAL RESPONSE:
+- You MUST respond in English only, not any other language
+- You MUST return ONLY the JSON format below, nothing else
+- Do NOT add any explanations, thoughts, or additional text
+
+   If both assistants were created successfully with the correct metadata and parameters, you MUST return exactly:
+   {"result": True, "phase": "setup_complete"}
+
+   If there were any issues, you MUST return exactly:
+   {"result": False, "phase": "setup_failed"}
+
+IMPORTANT: 
+- Your response must be ONLY the JSON above
+- Do NOT add any other text before or after the JSON

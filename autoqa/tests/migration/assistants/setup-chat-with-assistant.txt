@@ -1,0 +1,46 @@
+You are setting up a chat thread using a custom assistant in the OLD version of the Jan application.
+
+PHASE: SETUP CHAT THREAD (OLD VERSION)
+
+Step-by-step instructions:
+
+1. Open the Jan application (OLD version).
+
+2. Download the model:
+   - In the bottom-left corner, click **Hub**.
+   - Find and download the model named: `jan-nano-gguf`.
+   - Wait for the download to complete (the button changes to **Use**).
+   - Click the **Use** button to return to the Chat UI.
+
+3. Start a new chat using a custom assistant:
+   - In the main chat panel, click the assistant icon at the top (default is `Jan`).
+   - Select the custom assistant: `Python Tutor`.
+
+4. Select the model:
+   - Click the **Select a model** button below the chat input.
+   - Choose: `jan-nano-gguf` under the `Llama.Cpp` section.
+
+5. Send a test message:
+   - Type: `Hello world` and press Enter or click send message (button with right arrow).
+   - Wait up to 1–2 minutes for the model to load and respond.
+
+6. Verify the model responds:
+   - If the model replies appropriately, and the thread is created successfully in the left sidebar under **No threads yet**, return:
+     {"result": True, "phase": "setup_complete"}
+   - If no response is received or the chat thread is not saved:
+     {"result": False, "phase": "setup_failed"}
+5. Verify the model responds and return the result in the exact JSON format:
+
+CRITICAL INSTRUCTIONS FOR FINAL RESPONSE:
+- You MUST respond in English only, not any other language
+- You MUST return ONLY the JSON format below, nothing else
+- Do NOT add any explanations, thoughts, or additional text
+
+   - If the model replies appropriately, and the thread is created successfully in the left sidebar, return:
+     {"result": True, "phase": "setup_complete"}
+   - If no response is received:
+     {"result": False, "phase": "setup_failed"}
+
+IMPORTANT: 
+- Your response must be ONLY the JSON above
+- Do NOT add any other text before or after the JSON

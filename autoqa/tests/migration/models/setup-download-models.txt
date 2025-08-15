@@ -1,0 +1,51 @@
+prompt = """
+You are testing comprehensive model functionality persistence across Jan application upgrade.
+
+PHASE 1 - SETUP (OLD VERSION):
+Step-by-step instructions for OLD version setup:
+
+1. Given the Jan application is already opened (OLD version).
+
+2. Download multiple models from Hub:
+   - Click the **Hub** menu in the bottom-left corner
+   - Find and download **jan-nano-gguf** model
+   - Wait for download to complete (shows "Use" button)
+   - Find and download **gemma-2-2b-instruct-gguf** model if available
+   - Wait for second download to complete
+
+3. Test downloaded models in Hub:
+   - Verify both models show **Use** button instead of **Download**
+   - Click the **Downloaded** filter toggle on the right
+   - Verify both models appear in the downloaded models list
+   - Turn off the Downloaded filter
+
+4. Test models in chat:
+   - Click **New Chat**
+   - Select **jan-nano-gguf** from model dropdown
+   - Send: "Hello, can you tell me what model you are?"
+   - Wait for response
+   
+   - Create another new chat
+   - Select the second model from dropdown
+   - Send: "What's your model name and capabilities?"
+   - Wait for response
+
+5. Configure model provider settings:
+   - Go to **Settings** > **Model Providers**
+   - Click on **Llama.cpp** section
+   - Verify downloaded models are listed in the Models section
+   - Check that both models show correct names
+   - Try enabling **Auto-Unload Old Models** option
+   - Try adjusting **Context Length** for one of the models
+
+6. Test model settings persistence:
+   - Close Jan completely
+   - Reopen Jan
+   - Go to Settings > Model Providers > Llama.cpp
+   - Verify the Auto-Unload setting is still enabled
+   - Verify model settings are preserved
+
+If all models download successfully, appear in Hub with "Use" status, work in chat, and settings are preserved, return: {"result": True, "phase": "setup_complete"}, otherwise return: {"result": False, "phase": "setup_failed"}.
+
+In all your responses, use only plain ASCII characters. Do NOT use Unicode symbols.
+"""
