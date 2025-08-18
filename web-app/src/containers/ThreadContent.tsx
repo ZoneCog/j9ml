@@ -480,5 +480,20 @@ export const ThreadContent = memo(
         {item.contextOverflowModal && item.contextOverflowModal}
       </Fragment>
     )
+  },
+  // Custom comparison function to prevent unnecessary re-renders
+  (prevProps, nextProps) => {
+    // Check if the message content has changed
+    if (prevProps.id !== nextProps.id) return false
+    if (prevProps.content?.[0]?.text?.value !== nextProps.content?.[0]?.text?.value) return false
+    if (prevProps.isLastMessage !== nextProps.isLastMessage) return false
+    if (prevProps.showAssistant !== nextProps.showAssistant) return false
+    if (prevProps.metadata?.tool_calls !== nextProps.metadata?.tool_calls) return false
+    
+    // If streaming tools changed, re-render
+    if (prevProps.streamTools !== nextProps.streamTools) return false
+    
+    // Otherwise, prevent re-render
+    return true
   }
 )

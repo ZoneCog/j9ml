@@ -142,8 +142,11 @@ const LeftPanel = () => {
     select: (state) => state.location.pathname,
   })
 
-  const { deleteAllThreads, unstarAllThreads, getFilteredThreads, threads } =
-    useThreads()
+  // Use selective subscriptions to avoid unnecessary re-renders
+  const deleteAllThreads = useThreads((state) => state.deleteAllThreads)
+  const unstarAllThreads = useThreads((state) => state.unstarAllThreads)
+  const getFilteredThreads = useThreads((state) => state.getFilteredThreads)
+  const threads = useThreads((state) => state.threads)
 
   const filteredThreads = useMemo(() => {
     return getFilteredThreads(searchTerm)

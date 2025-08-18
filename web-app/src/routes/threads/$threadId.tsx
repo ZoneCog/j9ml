@@ -1,8 +1,7 @@
-import { useEffect, useMemo, useRef, useState } from 'react'
+import { useEffect, useMemo, useRef, useState, useCallback } from 'react'
 import { createFileRoute, useParams } from '@tanstack/react-router'
 import { UIEventHandler } from 'react'
 import debounce from 'lodash.debounce'
-import cloneDeep from 'lodash.clonedeep'
 import { cn } from '@/lib/utils'
 import { ArrowDown, Play } from 'lucide-react'
 
@@ -184,25 +183,27 @@ function ThreadDetail() {
     lastScrollTopRef.current = scrollTop
   }
 
-  const updateMessage = (item: ThreadMessage, message: string) => {
+  const updateMessage = useCallback((item: ThreadMessage, message: string) => {
     const newMessages: ThreadMessage[] = messages.map((m) => {
       if (m.id === item.id) {
-        const msg: ThreadMessage = cloneDeep(m)
-        msg.content = [
-          {
-            type: ContentType.Text,
-            text: {
-              value: message,
-              annotations: m.content[0].text?.annotations ?? [],
+        // Only clone and update the specific message that changed
+        return {
+          ...m,
+          content: [
+            {
+              type: ContentType.Text,
+              text: {
+                value: message,
+                annotations: m.content[0].text?.annotations ?? [],
+              },
             },
-          },
-        ]
-        return msg
+          ],
+        }
       }
       return m
     })
     setMessages(threadId, newMessages)
-  }
+  }, [messages, setMessages, threadId])
 
   // Use a shorter debounce time for more responsive scrolling
   const debouncedScroll = debounce(handleDOMScroll)

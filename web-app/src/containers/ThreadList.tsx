@@ -65,7 +65,10 @@ const SortableItem = memo(({ thread }: { thread: Thread }) => {
     transition,
     opacity: isDragging ? 0.5 : 1,
   }
-  const { toggleFavorite, deleteThread, renameThread } = useThreads()
+  // Only get the functions, not the state
+  const toggleFavorite = useThreads((state) => state.toggleFavorite)
+  const deleteThread = useThreads((state) => state.deleteThread)
+  const renameThread = useThreads((state) => state.renameThread)
   const { t } = useTranslation()
   const [openDropdown, setOpenDropdown] = useState(false)
   const navigate = useNavigate()
@@ -301,8 +304,8 @@ function ThreadList({ threads }: ThreadListProps) {
         items={sortedThreads.map((t) => t.id)}
         strategy={verticalListSortingStrategy}
       >
-        {sortedThreads.map((thread, index) => (
-          <SortableItem key={index} thread={thread} />
+        {sortedThreads.map((thread) => (
+          <SortableItem key={thread.id} thread={thread} />
         ))}
       </SortableContext>
     </DndContext>
