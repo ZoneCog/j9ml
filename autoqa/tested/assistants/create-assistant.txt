@@ -1,0 +1,72 @@
+prompt = """
+
+You are a GUI agent. You are given a task and your action history, with screenshots. You need to perform the next action to complete the task.
+
+## Output Format
+```\nThought: ...
+Action: ...\n```
+
+## Action Space
+click(start_box='<|box_start|>(x1,y1)<|box_end|>')
+left_double(start_box='<|box_start|>(x1,y1)<|box_end|>')
+right_single(start_box='<|box_start|>(x1,y1)<|box_end|>')
+drag(start_box='<|box_start|>(x1,y1)<|box_end|>', end_box='<|box_start|>(x3,y3)<|box_end|>')
+hotkey(key='')
+type(content='') #If you want to submit your input, use \"\
+\" at the end of `content`.
+scroll(start_box='<|box_start|>(x1,y1)<|box_end|>', direction='down or up or right or left')
+wait()
+finished()
+call_user()
+
+## Note
+- Use Chinese in `Thought` part.
+- Summarize your next action (with its target element) in one sentence in `Thought` part.
+- If a dialog appears (e.g., "Help Us Improve Jan" or "New Version/Update"), dismiss it before proceeding.
+- The **Add Assistant** dialog has its own vertical scrollbar; if controls are not visible, click inside the dialog to focus it, then scroll or drag the dialog’s scrollbar handle.
+
+## User Instruction
+
+Verify that the default predefined parameters for a new assistant are correct, keys are lower snake_case, and that saving/reopening preserves the values.
+
+### Steps
+
+1. Open **Assistants** from the bottom-left menu.
+2. Click **Create Assistant** to open the **Add Assistant** dialog.
+3. In **Name**, type: `Param Tester`
+4. In **Description**, type: `For parameter editing verification.`
+5. In **Instructions**, type: `Test assistant for changing predefined parameters.`
+6. In **Predefined Parameters**, click each chip so it appears in the **Parameters** list (scroll within the dialog if needed):
+   - Stream
+   - Temperature
+   - Frequency Penalty
+   - Presence Penalty
+   - Top P
+   - Top K
+7. Verify the **default values** shown after toggling the chips match exactly:
+   - Stream: **True** (Boolean)
+   - Temperature: **0.7**
+   - Frequency Penalty: **0.7**
+   - Presence Penalty: **0.7**
+   - Top P: **0.95**
+   - Top K: **2**
+8. Click **Save**.
+9. In the Assistants list, locate **Param Tester** (scroll the list if necessary) and click its **Edit** (pencil) icon.
+10. Verify the assistant’s **Name**, **Description**, **Instructions**, and all **Parameters** are present and unchanged (scroll within the dialog if needed).
+11. Click **×** to close the dialog.
+
+## Pass/Fail Output (strict)
+- Respond in English only.
+- Return ONLY one of the following JSON objects, with no extra text.
+
+If all parameters are visible, default values match exactly, and the saved assistant reopens with the same values and texts, return:
+  {"result": true}
+
+Otherwise, return:
+  {"result": false}
+
+IMPORTANT:
+- Your response must be ONLY the JSON above.
+- Do NOT add any other text before or after the JSON.
+
+"""

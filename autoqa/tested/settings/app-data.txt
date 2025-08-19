@@ -1,0 +1,65 @@
+prompt = """
+
+You are a GUI agent. You are given a task and your action history, with screenshots. You need to perform the next action to complete the task.
+
+## Output Format
+```\nThought: ...
+Action: ...\n```
+
+## Action Space
+click(start_box='<|box_start|>(x1,y1)<|box_end|>')
+left_double(start_box='<|box_start|>(x1,y1)<|box_end|>')
+right_single(start_box='<|box_start|>(x1,y1)<|box_end|>')
+drag(start_box='<|box_start|>(x1,y1)<|box_end|>', end_box='<|box_start|>(x3,y3)<|box_end|>')
+hotkey(key='')
+type(content='') #If you want to submit your input, use \"\
+\" at the end of `content`.
+scroll(start_box='<|box_start|>(x1,y1)<|box_end|>', direction='down or up or right or left')
+wait()
+finished()
+call_user()
+
+## Note
+- Use Chinese in `Thought` part.
+- Summarize your next action (with its target element) in one sentence in `Thought` part.
+- If a dialog appears (e.g., "Help Us Improve Jan" or "New Version/Update"), dismiss it before proceeding.
+- The **Add Assistant** dialog has its own vertical scrollbar; if controls are not visible, click inside the dialog to focus it, then scroll or drag the dialog’s scrollbar handle.
+
+## User Instruction
+
+You are going to verify the App data folder path shown in Jan’s Settings.
+
+Navigation: **Settings > General**
+
+Step-by-step instructions:
+0. Given the Jan application is already opened.
+1. If a dialog appears in the bottom-right corner titled **"Help Us Improve Jan"**, click **Deny** to dismiss it before continuing.
+2. In the bottom-left menu, click on **Settings**.
+3. In the left sidebar, click on **General**.
+4. In the **Data folder** section of **General**, locate **App data** and the line **"Default location for messages and other user data:"**. Read the displayed path.
+5. Verify the displayed path matches **one** of the expected OS-specific defaults below (accept either the standard or nightly variant):
+   - **Windows (standard):** `C:\\Users\\<Username>\\AppData\\Roaming\\Jan\\data`
+   - **Windows (nightly):** `C:\\Users\\<Username>\\AppData\\Roaming\\Jan-nightly\\data`
+   - **macOS (standard):** `/Users/<Username>/Library/Application Support/Jan/data`
+   - **macOS (nightly):** `/Users/<Username>/Library/Application Support/Jan-nightly/data`
+   - **Linux (standard):** `/home/<Username>/.local/share/Jan/data`
+   - **Linux (nightly):** `/home/<Username>/.local/share/Jan-nightly/data`
+
+Notes for verification (guidance only, do not display to user):
+- Windows paths typically start with a drive letter and include `\\AppData\\Roaming\\Jan\\data` or `\\AppData\\Roaming\\Jan-nightly\\data`.
+- macOS paths start with `/Users/` and include `/Library/Application Support/Jan/data` or `/Library/Application Support/Jan-nightly/data`.
+- Linux paths start with `/home/` and include `/.local/share/Jan/data` or `/.local/share/Jan-nightly/data`.
+- If the **Data folder** section is not visible, scroll down within **General** until it appears.
+
+CRITICAL INSTRUCTIONS FOR FINAL RESPONSE:
+- You MUST respond in English only, not any other language
+- You MUST return ONLY the JSON format below, nothing else
+- Do NOT add any explanations, thoughts, or additional text
+
+   If the displayed App data path matches one of the expected OS-specific defaults above, return: {"result": True}. Otherwise, return: {"result": False}.
+
+IMPORTANT: 
+- Your response must be ONLY the JSON above
+- Do NOT add any other text before or after the JSON
+
+"""

@@ -1,39 +1,84 @@
 prompt = """
-You are verifying that model downloads and settings persist after Jan application upgrade.
+You are a GUI agent. You are given a task and your action history, with screenshots. You need to perform the next action to complete the task. 
 
-PHASE 2 - VERIFICATION (NEW VERSION):
-Step-by-step instructions for NEW version verification:
+## Output Format
+```\nThought: ...
+Action: ...\n```
 
-1. Given the Jan application is already opened (NEW version after upgrade).
+## Action Space
 
-2. Verify models in Hub:
-   - Click the **Hub** menu in the bottom-left corner
-   - Look for the models that were downloaded: **jan-nano-gguf** and others
-   - Verify they show **Use** button instead of **Download** button
-   - Click the **Downloaded** filter toggle on the right
-   - Verify downloaded models appear in the filtered list
-   - Turn off the Downloaded filter
+click(start_box='<|box_start|>(x1,y1)<|box_end|>')
+left_double(start_box='<|box_start|>(x1,y1)<|box_end|>')
+right_single(start_box='<|box_start|>(x1,y1)<|box_end|>')
+drag(start_box='<|box_start|>(x1,y1)<|box_end|>', end_box='<|box_start|>(x3,y3)<|box_end|>')
+hotkey(key='')
+type(content='') #If you want to submit your input, use \"\
+\" at the end of `content`.
+scroll(start_box='<|box_start|>(x1,y1)<|box_end|>', direction='down or up or right or left')
+wait() #Sleep for 5s and take a screenshot to check for any changes.
+finished()
+call_user() # Submit the task and call the user when the task is unsolvable, or when you need the user's help.
 
-3. Verify models are available in chat:
-   - Click **New Chat**
-   - Click on the model dropdown
-   - Verify downloaded models appear in the selectable list
-   - Select **jan-nano-gguf**
-   - Send: "Are you working correctly after the app upgrade?"
-   - Wait for response - should work normally
 
-4. Verify model provider settings:
-   - Go to **Settings** > **Model Providers**
-   - Click on **Llama.cpp** section (in the left sidebar, NOT the toggle)
-   - Verify downloaded models are listed in the Models section with correct names
-   - Check that any previously configured settings are preserved
+## Note
+- Use Chinese in `Thought` part.
+- Summarize your next action (with its target element) in one sentence in `Thought` part.
 
-5. Test model management features:
-   - In the Models list, verify you can see model details
-   - Test that you can still start/stop models if applicable
-   - Verify model functionality is intact
+## User Instruction
 
-If all downloaded models are preserved, show correct status in Hub, work in chat, and model provider settings are maintained, return: {"result": True, "phase": "verification_complete"}, otherwise return: {"result": False, "phase": "verification_failed"}.
+You are verifying that downloaded models persist after upgrading to the NEW version of the Jan application.
 
-In all your responses, use only plain ASCII characters. Do NOT use Unicode symbols.
+PHASE: VERIFY MODEL PERSISTENCE (NEW VERSION)
+
+Step-by-step instructions:
+
+1. Open the Jan application (NEW version).
+
+2. Check Hub for downloaded models:
+   - In the bottom-left corner, click **Hub**.
+   - Look for the **Downloaded** filter toggle on the right side.
+   - Click the **Downloaded** filter to show only downloaded models.
+
+3. Verify first model:
+   - Check if `jan-nano-gguf` appears in the downloaded models list.
+   - Verify it shows the **Use** button (not **Download**).
+
+4. Verify second model:
+   - Check if `gemma-2-2b-instruct-gguf` appears in the downloaded models list.
+   - Verify it shows the **Use** button (not **Download**).
+
+5. Test model functionality in chat:
+   - Click **New Chat** to start a new conversation.
+   - Click the **Select a model** button below the chat input.
+   - Check if both models appear under the `Llama.Cpp` section:
+     - `jan-nano-gguf`
+     - `gemma-2-2b-instruct-gguf`
+   - Select `jan-nano-gguf` as the model.
+   - Send a test message: `Hello, are you still working after the upgrade?`
+   - Wait for a response.
+
+6. Check model provider settings:
+   - Go to **Settings** > **Model Providers**.
+   - Click on **Llama.cpp** section.
+   - Verify both models are listed in the Models section.
+
+7. Return result:
+   - If both models persist and are functional, return:
+     {"result": True, "phase": "verification_complete"}
+   - If any models are missing or not working, return:
+     {"result": False, "phase": "verification_failed"}
+
+CRITICAL INSTRUCTIONS FOR FINAL RESPONSE:
+- You MUST respond in English only, not any other language
+- You MUST return ONLY the JSON format below, nothing else
+- Do NOT add any explanations, thoughts, or additional text
+
+   - If both models persist and work correctly, return:
+     {"result": True, "phase": "verification_complete"}
+   - If there are any issues, return:
+     {"result": False, "phase": "verification_failed"}
+
+IMPORTANT: 
+- Your response must be ONLY the JSON above
+- Do NOT add any other text before or after the JSON
 """

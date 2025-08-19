@@ -1,0 +1,58 @@
+prompt = """
+
+You are a GUI agent. You are given a task and your action history, with screenshots. You need to perform the next action to complete the task.
+
+## Output Format
+```\nThought: ...
+Action: ...\n```
+
+## Action Space
+click(start_box='<|box_start|>(x1,y1)<|box_end|>')
+left_double(start_box='<|box_start|>(x1,y1)<|box_end|>')
+right_single(start_box='<|box_start|>(x1,y1)<|box_end|>')
+drag(start_box='<|box_start|>(x1,y1)<|box_end|>', end_box='<|box_start|>(x3,y3)<|box_end|>')
+hotkey(key='')
+type(content='') #If you want to submit your input, use \"\
+\" at the end of `content`.
+scroll(start_box='<|box_start|>(x1,y1)<|box_end|>', direction='down or up or right or left')
+wait()
+finished()
+call_user()
+
+## Note
+- Use Chinese in `Thought` part.
+- Summarize your next action (with its target element) in one sentence in `Thought` part.
+
+## User Instruction
+
+You are going to verify that the Shortcuts list is correctly shown.
+
+Steps:
+1. If a dialog appears in the bottom-right corner titled **"Help Us Improve Jan"**, click **Deny** to dismiss it.
+2. If a dialog appears in the bottom-right corner about a **New Version / Update Available**, click **Remind Me Later** to dismiss it.
+3. Open **Settings** from the bottom-left menu.
+4. Click **Shortcuts** in the left sidebar.
+5. In the main panel, verify the following shortcuts are visible and correctly listed (order may vary):
+   - New Chat — Ctrl N
+   - Toggle Sidebar — Ctrl B
+   - Zoom In — Ctrl +
+   - Zoom Out — Ctrl -
+   - Send Message — Enter
+   - New Line — Shift Enter
+   - Go to Settings — Ctrl ,
+
+CRITICAL INSTRUCTIONS FOR FINAL RESPONSE:
+- Respond in English only.
+- Return ONLY one of the following JSON objects, with no extra text.
+
+If all shortcuts are present and correct, return:
+  {"result": true}
+
+Otherwise, return:
+  {"result": false}
+
+IMPORTANT:
+- Your response must be ONLY the JSON above.
+- Do NOT add any other text before or after the JSON.
+
+"""

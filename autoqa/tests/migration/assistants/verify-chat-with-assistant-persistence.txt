@@ -1,37 +1,74 @@
-You are verifying that a previously created chat thread with a custom assistant persists and functions correctly after upgrading the Jan application.
+prompt = """
+You are a GUI agent. You are given a task and your action history, with screenshots. You need to perform the next action to complete the task. 
 
-PHASE: VERIFY CHAT THREAD (NEW VERSION)
+## Output Format
+```\nThought: ...
+Action: ...\n```
+
+## Action Space
+
+click(start_box='<|box_start|>(x1,y1)<|box_end|>')
+left_double(start_box='<|box_start|>(x1,y1)<|box_end|>')
+right_single(start_box='<|box_start|>(x1,y1)<|box_end|>')
+drag(start_box='<|box_start|>(x1,y1)<|box_end|>', end_box='<|box_start|>(x3,y3)<|box_end|>')
+hotkey(key='')
+type(content='') #If you want to submit your input, use \"\
+\" at the end of `content`.
+scroll(start_box='<|box_start|>(x1,y1)<|box_end|>', direction='down or up or right or left')
+wait() #Sleep for 5s and take a screenshot to check for any changes.
+finished()
+call_user() # Submit the task and call the user when the task is unsolvable, or when you need the user's help.
+
+
+## Note
+- Use Chinese in `Thought` part.
+- Summarize your next action (with its target element) in one sentence in `Thought` part.
+
+## User Instruction
+
+You are verifying that chat threads with custom assistants persist after upgrading to the NEW version of the Jan application.
+
+PHASE: VERIFY CHAT THREAD PERSISTENCE (NEW VERSION)
 
 Step-by-step instructions:
 
-1. Open the Jan application (NEW version after upgrade).
+1. Open the Jan application (NEW version).
 
-2. Verify that the previous chat thread still exists:
-   - Look in the **left sidebar** under the **Recents** section.
-   - Confirm that a thread exists with the title: `Hello world` (this is based on the initial message sent).
-   - Click on that thread to open it.
+2. Check for existing chat threads:
+   - Look in the left sidebar for any existing chat threads.
+   - If you see threads, click on one to open it.
 
-3. Verify the assistant identity:
-   - In the opened thread, look at the top of the message from the assistant.
-   - Confirm it shows the assistant name: `Python Tutor`, along with the selected emoji next to it.
-   - Confirm that the assistant’s previous response is visible.
+3. Verify the custom assistant is still available:
+   - In the main chat panel, click the assistant icon at the top.
+   - Check if the custom assistant `Python Tutor` is still available in the list.
 
-4. Send a follow-up test message:
-   - Type: `Can you explain how for loops work in Python?` and press Enter.
-   - Wait for a complete response from the assistant.
+4. Verify the model is still available:
+   - Click the **Select a model** button below the chat input.
+   - Check if `jan-nano-gguf` is still available under the `Llama.Cpp` section.
 
-5. Verify correct behavior:
+5. Test chat functionality:
+   - Select the `Python Tutor` assistant.
+   - Select the `jan-nano-gguf` model.
+   - Send a test message: `Hello, can you help me with Python?`
+   - Wait for a response.
+
+6. Return result:
+   - If the chat thread, assistant, and model all persist and work correctly, return:
+     {"result": True, "phase": "verification_complete"}
+   - If any of these elements are missing or not working, return:
+     {"result": False, "phase": "verification_failed"}
 
 CRITICAL INSTRUCTIONS FOR FINAL RESPONSE:
 - You MUST respond in English only, not any other language
 - You MUST return ONLY the JSON format below, nothing else
 - Do NOT add any explanations, thoughts, or additional text
 
-   - If the assistant responds clearly and informatively, maintaining the tutoring tone, and the thread identity (`Python Tutor`) is preserved, return:
-     {"result": true, "phase": "verification_complete"}
-   - If the thread is missing, the assistant identity is incorrect, or the assistant fails to respond, return:
-     {"result": false, "phase": "verification_failed"}
+   - If everything persists and works correctly, return:
+     {"result": True, "phase": "verification_complete"}
+   - If there are any issues, return:
+     {"result": False, "phase": "verification_failed"}
 
 IMPORTANT: 
 - Your response must be ONLY the JSON above
 - Do NOT add any other text before or after the JSON
+"""

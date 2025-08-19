@@ -1,48 +1,73 @@
-You are verifying that custom assistants persist correctly after upgrading the Jan application.
+prompt = """
+You are a GUI agent. You are given a task and your action history, with screenshots. You need to perform the next action to complete the task. 
 
-PHASE 2 - VERIFICATION (NEW VERSION):
-Step-by-step instructions for verifying assistant persistence in the NEW version:
+## Output Format
+```\nThought: ...
+Action: ...\n```
 
-1. Open the Jan application (NEW version after upgrade).
+## Action Space
 
-2. Verify that previously created assistants are preserved:
-   - In the bottom-left corner, click **Assistants**.
-   - Confirm that you see the following assistants in the list:
-     - Default assistant: `Jan`
-     - Custom assistant: `Python Tutor`
-     - Custom assistant: `Creative Writer`
+click(start_box='<|box_start|>(x1,y1)<|box_end|>')
+left_double(start_box='<|box_start|>(x1,y1)<|box_end|>')
+right_single(start_box='<|box_start|>(x1,y1)<|box_end|>')
+drag(start_box='<|box_start|>(x1,y1)<|box_end|>', end_box='<|box_start|>(x3,y3)<|box_end|>')
+hotkey(key='')
+type(content='') #If you want to submit your input, use \"\
+\" at the end of `content`.
+scroll(start_box='<|box_start|>(x1,y1)<|box_end|>', direction='down or up or right or left')
+wait() #Sleep for 5s and take a screenshot to check for any changes.
+finished()
+call_user() # Submit the task and call the user when the task is unsolvable, or when you need the user's help.
 
-3. Verify the details of each assistant:
 
-   - Click on Edit (Pencil Icon) of `Python Tutor`:
-     - Confirm **Name**: `Python Tutor`
-     - Confirm **Description**: `A helpful Python programming tutor`
-     - Confirm **Instructions** contain:
-       ```
-       You are an expert Python tutor. Always explain concepts clearly with examples. Use encouraging language and provide step-by-step solutions.
-       ```
+## Note
+- Use Chinese in `Thought` part.
+- Summarize your next action (with its target element) in one sentence in `Thought` part.
 
-   - Click on Edit (Pencil Icon) of `Creative Writer`:
-     - Confirm **Name**: `Creative Writer`
-     - Confirm **Description**: `A creative writing assistant for stories and poems`
-     - Confirm **Instructions** contain:
-       ```
-       You are a creative writing assistant. Help users write engaging stories, poems, and creative content. Be imaginative and inspiring.
-       ```
+## User Instruction
 
-4. Return the verification result:
+You are verifying that custom assistants persist after upgrading to the NEW version of the Jan application.
+
+PHASE: VERIFY ASSISTANT PERSISTENCE (NEW VERSION)
+
+Step-by-step instructions:
+
+1. Open the Jan application (NEW version).
+
+2. Navigate to Assistants:
+   - In the bottom-left menu, click **Assistants**.
+
+3. Verify first custom assistant:
+   - Look for the `Python Tutor` assistant in the list.
+   - Click on it to view details.
+   - Verify the name is exactly: `Python Tutor`
+   - Verify the description contains: `A helpful Python programming tutor that explains concepts clearly and provides code examples.`
+   - Verify the instructions contain: `You are a Python programming tutor. Help users learn Python by explaining concepts clearly, providing code examples, and answering questions about Python programming.`
+
+4. Verify second custom assistant:
+   - Look for the `Creative Writer` assistant in the list.
+   - Click on it to view details.
+   - Verify the name is exactly: `Creative Writer`
+   - Verify the description contains: `A creative writing assistant that helps with storytelling, poetry, and creative content.`
+   - Verify the instructions contain: `You are a creative writing assistant. Help users develop stories, write poetry, and create engaging creative content. Provide constructive feedback and creative suggestions.`
+
+5. Return result:
+   - If both assistants persist with correct names, descriptions, and instructions, return:
+     {"result": True, "phase": "verification_complete"}
+   - If any assistant is missing or has incorrect details, return:
+     {"result": False, "phase": "verification_failed"}
 
 CRITICAL INSTRUCTIONS FOR FINAL RESPONSE:
 - You MUST respond in English only, not any other language
 - You MUST return ONLY the JSON format below, nothing else
 - Do NOT add any explanations, thoughts, or additional text
 
-If all custom assistants are preserved with correct settings and parameters, return EXACTLY:
-{"result": true, "phase": "verification_complete"}
-
-If any assistants are missing or have incorrect settings, return EXACTLY:
-{"result": false, "phase": "verification_failed"}
+   - If both assistants persist correctly, return:
+     {"result": True, "phase": "verification_complete"}
+   - If there are any issues, return:
+     {"result": False, "phase": "verification_failed"}
 
 IMPORTANT: 
 - Your response must be ONLY the JSON above
 - Do NOT add any other text before or after the JSON
+"""

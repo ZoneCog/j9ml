@@ -1,53 +1,77 @@
-You are testing custom assistants persistence across Jan application upgrade.
+prompt = """
+You are a GUI agent. You are given a task and your action history, with screenshots. You need to perform the next action to complete the task. 
 
-PHASE 1 - SETUP (OLD VERSION):
-Step-by-step instructions for creating assistants in the OLD version:
+## Output Format
+```\nThought: ...
+Action: ...\n```
+
+## Action Space
+
+click(start_box='<|box_start|>(x1,y1)<|box_end|>')
+left_double(start_box='<|box_start|>(x1,y1)<|box_end|>')
+right_single(start_box='<|box_start|>(x1,y1)<|box_end|>')
+drag(start_box='<|box_start|>(x1,y1)<|box_end|>', end_box='<|box_start|>(x3,y3)<|box_end|>')
+hotkey(key='')
+type(content='') #If you want to submit your input, use \"\
+\" at the end of `content`.
+scroll(start_box='<|box_start|>(x1,y1)<|box_end|>', direction='down or up or right or left')
+wait() #Sleep for 5s and take a screenshot to check for any changes.
+finished()
+call_user() # Submit the task and call the user when the task is unsolvable, or when you need the user's help.
+
+
+## Note
+- Use Chinese in `Thought` part.
+- Summarize your next action (with its target element) in one sentence in `Thought` part.
+
+## User Instruction
+
+You are setting up custom assistants in the OLD version of the Jan application.
+
+PHASE: SETUP CUSTOM ASSISTANTS (OLD VERSION)
+
+Step-by-step instructions:
 
 1. Open the Jan application (OLD version).
 
-2. Create the first assistant - Python Tutor:
-   - In the bottom-left corner, click **Assistants**.
-   - Click the **+** button to create a new assistant.
-   - In the **Add Assistant** modal:
-     - Select an emoji for the assistant.
-     - Set **Name**: `Python Tutor`
-     - Set **Description**: `A helpful Python programming tutor`
-     - Set **Instructions**:
-       ```
-       You are an expert Python tutor. Always explain concepts clearly with examples. Use encouraging language and provide step-by-step solutions.
-       ```
-     - Click **Save**.
+2. Navigate to Assistants:
+   - In the bottom-left menu, click **Assistants**.
 
-3. Create the second assistant - Creative Writer:
-   - Click the **+** button to create another assistant.
-   - In the **Add Assistant** modal:
-     - Select a different emoji.
-     - Set **Name**: `Creative Writer`
-     - Set **Description**: `A creative writing assistant for stories and poems`
-     - Set **Instructions**:
-       ```
-       You are a creative writing assistant. Help users write engaging stories, poems, and creative content. Be imaginative and inspiring.
-       ```
-     - Click **Save**.
+3. Create first custom assistant:
+   - Click **Create Assistant** button.
+   - Enter name: `Python Tutor`
+   - Enter description: `A helpful Python programming tutor that explains concepts clearly and provides code examples.`
+   - Enter instructions: `You are a Python programming tutor. Help users learn Python by explaining concepts clearly, providing code examples, and answering questions about Python programming.`
+   - Click **Create** button.
 
-4. Verify both assistants appear in the list:
-   - Return to the **Assistants** section.
-   - Confirm you see both `Python Tutor` and `Creative Writer`.
-   - Confirm the names and descriptions are correctly displayed.
+4. Create second custom assistant:
+   - Click **Create Assistant** button again.
+   - Enter name: `Creative Writer`
+   - Enter description: `A creative writing assistant that helps with storytelling, poetry, and creative content.`
+   - Enter instructions: `You are a creative writing assistant. Help users develop stories, write poetry, and create engaging creative content. Provide constructive feedback and creative suggestions.`
+   - Click **Create** button.
 
-5. Return the result in the exact JSON format:
+5. Verify assistants were created:
+   - Check that both `Python Tutor` and `Creative Writer` appear in the assistants list.
+   - Verify their names, descriptions, and instructions are correct.
+
+6. Return result:
+   - If both assistants are created successfully with correct details, return:
+     {"result": True, "phase": "setup_complete"}
+   - If there are any issues with creation or verification, return:
+     {"result": False, "phase": "setup_failed"}
 
 CRITICAL INSTRUCTIONS FOR FINAL RESPONSE:
 - You MUST respond in English only, not any other language
 - You MUST return ONLY the JSON format below, nothing else
 - Do NOT add any explanations, thoughts, or additional text
 
-   If both assistants were created successfully with the correct metadata and parameters, you MUST return exactly:
-   {"result": True, "phase": "setup_complete"}
-
-   If there were any issues, you MUST return exactly:
-   {"result": False, "phase": "setup_failed"}
+   - If both assistants are created successfully, return:
+     {"result": True, "phase": "setup_complete"}
+   - If there are any issues, return:
+     {"result": False, "phase": "setup_failed"}
 
 IMPORTANT: 
 - Your response must be ONLY the JSON above
 - Do NOT add any other text before or after the JSON
+"""

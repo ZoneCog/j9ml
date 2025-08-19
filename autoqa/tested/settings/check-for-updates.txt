@@ -1,0 +1,55 @@
+prompt = """
+
+You are a GUI agent. You are given a task and your action history, with screenshots. You need to perform the next action to complete the task.
+
+## Output Format
+```\nThought: ...
+Action: ...\n```
+
+## Action Space
+click(start_box='<|box_start|>(x1,y1)<|box_end|>')
+left_double(start_box='<|box_start|>(x1,y1)<|box_end|>')
+right_single(start_box='<|box_start|>(x1,y1)<|box_end|>')
+drag(start_box='<|box_start|>(x1,y1)<|box_end|>', end_box='<|box_start|>(x3,y3)<|box_end|>')
+hotkey(key='')
+type(content='') #If you want to submit your input, use \"\
+\" at the end of `content`.
+scroll(start_box='<|box_start|>(x1,y1)<|box_end|>', direction='down or up or right or left')
+wait()
+finished()
+call_user()
+
+## Note
+- Use Chinese in `Thought` part.
+- Summarize your next action (with its target element) in one sentence in `Thought` part.
+- If a dialog appears (e.g., "Help Us Improve Jan" or "New Version/Update"), dismiss it before proceeding.
+- If **New Version Available** popup appears on app launch (older versions), click **Remind Me Later** to dismiss it before continuing.
+
+## User Instruction
+
+You are going to test the **Check for Updates** function in Jan’s Settings.
+
+Navigation: **Settings > General**
+
+Step-by-step instructions:
+0. Given the Jan application is already opened.
+1. If a dialog appears in the bottom-right corner titled **"Help Us Improve Jan"**, click **Deny** to dismiss it before continuing.
+2. If a **New Version Available** popup (e.g., "New Version 0.6.8 Update Available") appears immediately on startup, click **Remind Me Later** to dismiss it before continuing.
+3. In the bottom-left menu, click on **Settings**.
+4. In the left sidebar, click on **General**.
+5. In the **General** section, locate **Check for Updates** and click the button.
+6. Verify the behavior:
+   - If Jan is already up to date, a message such as **"You're running the latest version"** should appear.
+   - If a new version is available, a popup should appear in the bottom-right corner with text like **"New Version X.Y.Z Update Available"** (e.g., "New Version 0.6.8 Update Available"), confirming the update check works as expected.
+
+CRITICAL INSTRUCTIONS FOR FINAL RESPONSE:
+- You MUST respond in English only, not any other language
+- You MUST return ONLY the JSON format below, nothing else
+- Do NOT add any explanations, thoughts, or additional text
+
+   If the **Check for Updates** button correctly shows either "You're running the latest version" or the new version popup (e.g., "New Version 0.6.8 Update Available"), return: {"result": True}. Otherwise, return: {"result": False}.
+
+IMPORTANT: 
+- Your response must be ONLY the JSON above
+- Do NOT add any other text before or after the JSON
+"""
