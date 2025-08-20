@@ -28,7 +28,7 @@ on:
         description: 'Is the app a nightly build?'
         required: true
         type: boolean
-        default: true
+        default: false
       reliability_phase:
         description: 'Reliability phase'
         required: true
