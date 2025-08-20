@@ -95,7 +95,7 @@ jobs:
         run: |
           $runs = "${{ inputs.reliability_runs }}"
           $runsArg = ""
-          if ([int]$runs -gt 0) { $runsArg = "--reliability-runs $runs" }
+          if ([int]$runs -gt 0) { $runsArg = "--reliability-runs=$runs" }
           python main.py --enable-reliability-test --reliability-phase "${{ inputs.reliability_phase }}" --reliability-test-path "${{ inputs.reliability_test_path }}" $runsArg
 
       - name: Upload screen recordings
@@ -157,7 +157,8 @@ jobs:
             libatk1.0-0 \
             libcairo-gobject2 \
             libgdk-pixbuf2.0-0 \
-            gnome-screenshot
+            gnome-screenshot \
+            xvfb
 
       - name: Setup script permissions
         run: |
@@ -199,15 +200,13 @@ jobs:
 
       - name: Run reliability tests
         working-directory: autoqa
-        env:
-          DISPLAY: ${{ env.DISPLAY }}
         run: |
           runs="${{ inputs.reliability_runs }}"
           runsArg=""
-          if [ "${runs}" -gt 0 ]; then runsArg="--reliability-runs ${runs}"; fi
+          if [ "${runs}" -gt 0 ]; then runsArg="--reliability-runs=${runs}"; fi
           processName="${JAN_PROCESS_NAME}"
           janBin="${RUNTIME_JAN_BIN}"
-          python main.py --enable-reliability-test --reliability-phase "${{ inputs.reliability_phase }}" --reliability-test-path "${{ inputs.reliability_test_path }}" ${runsArg} --jan-process-name "${processName}" --jan-app-path "${janBin}"
+          xvfb-run -a python main.py --enable-reliability-test --reliability-phase "${{ inputs.reliability_phase }}" --reliability-test-path "${{ inputs.reliability_test_path }}" ${runsArg} --jan-process-name "${processName}" --jan-app-path "${janBin}"
 
       - name: Upload screen recordings
         if: always()
