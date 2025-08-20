@@ -140,8 +140,6 @@ MAX_TURNS=50 DELAY_BETWEEN_TESTS=5 python main.py
 
 ## Migration Testing Arguments
 
-**Note**: These arguments are planned for future implementation based on your sample commands.
-
 | Argument | Environment Variable | Default | Description |
 |----------|---------------------|---------|-------------|
 | `--enable-migration-test` | `ENABLE_MIGRATION_TEST` | `false` | Enable migration testing mode |
@@ -149,6 +147,15 @@ MAX_TURNS=50 DELAY_BETWEEN_TESTS=5 python main.py
 | `--migration-batch-mode` | `MIGRATION_BATCH_MODE` | `false` | Use batch mode for migration tests |
 | `--old-version` | `OLD_VERSION` | - | Path to old version installer |
 | `--new-version` | `NEW_VERSION` | - | Path to new version installer |
+
+## Reliability Testing Arguments
+
+| Argument | Environment Variable | Default | Description |
+|----------|---------------------|---------|-------------|
+| `--enable-reliability-test` | `ENABLE_RELIABILITY_TEST` | `false` | Enable reliability testing mode |
+| `--reliability-phase` | `RELIABILITY_PHASE` | `development` | Testing phase: development (5 runs) or deployment (20 runs) |
+| `--reliability-runs` | `RELIABILITY_RUNS` | `0` | Custom number of runs (overrides phase setting) |
+| `--reliability-test-path` | `RELIABILITY_TEST_PATH` | - | Specific test file path for reliability testing |
 
 **Examples:**
 ```bash
@@ -216,6 +223,52 @@ python main.py \
   --enable-reportportal \
   --rp-token "YOUR_TOKEN" \
   --rp-project "jan_migration_tests"
+
+# Reliability testing - deployment phase with ReportPortal
+python main.py \
+  --enable-reliability-test \
+  --reliability-phase deployment \
+  --reliability-test-path "tests/base/default-jan-assistant.txt" \
+  --max-turns 50 \
+  --enable-reportportal \
+  --rp-token "YOUR_TOKEN" \
+  --rp-project "jan_reliability_tests"
+
+### Reliability Testing
+
+```bash
+# Development phase reliability test (5 runs)
+python main.py \
+  --enable-reliability-test \
+  --reliability-phase development \
+  --max-turns 40
+
+# Deployment phase reliability test (20 runs)
+python main.py \
+  --enable-reliability-test \
+  --reliability-phase deployment \
+  --max-turns 40
+
+# Custom number of runs
+python main.py \
+  --enable-reliability-test \
+  --reliability-runs 10 \
+  --max-turns 40
+
+# Test specific file with reliability testing
+python main.py \
+  --enable-reliability-test \
+  --reliability-phase development \
+  --reliability-test-path "tests/base/default-jan-assistant.txt" \
+  --max-turns 40
+
+# Reliability testing with ReportPortal
+python main.py \
+  --enable-reliability-test \
+  --reliability-phase deployment \
+  --enable-reportportal \
+  --rp-token "YOUR_TOKEN" \
+  --max-turns 40
 ```
 
 ### Advanced Configuration
@@ -265,12 +318,18 @@ python main.py \
 - `TESTS_DIR`: Test files directory
 - `DELAY_BETWEEN_TESTS`: Delay between tests
 
-### Migration Testing (Planned)
+### Migration Testing
 - `ENABLE_MIGRATION_TEST`: Enable migration mode
 - `MIGRATION_TEST_CASE`: Migration test case
 - `MIGRATION_BATCH_MODE`: Use batch mode
 - `OLD_VERSION`: Old installer path
 - `NEW_VERSION`: New installer path
+
+### Reliability Testing
+- `ENABLE_RELIABILITY_TEST`: Enable reliability testing mode
+- `RELIABILITY_PHASE`: Testing phase (development/deployment)
+- `RELIABILITY_RUNS`: Custom number of runs
+- `RELIABILITY_TEST_PATH`: Specific test file path
 
 ## Help and Information
 

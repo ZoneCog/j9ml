@@ -49,7 +49,7 @@ Step-by-step instructions:
    - Choose: `jan-nano-gguf` under the `Llama.Cpp` section.
 
 5. Send a test message:
-   - Type: `Hello world` and press Enter or click send message (button with right arrow).
+   - Type: `Hello world` and press Enter or click send message (button with right arrow). You should click at the center of the button.
    - Wait up to 1–2 minutes for the model to load and respond.
 
 6. Verify the model responds:

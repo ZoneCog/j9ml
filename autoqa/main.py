@@ -13,6 +13,7 @@ from reportportal_client.helpers import timestamp
 from utils import scan_test_files
 from test_runner import run_single_test_with_timeout
 from individual_migration_runner import run_individual_migration_test, run_all_migration_tests, MIGRATION_TEST_CASES
+from reliability_runner import run_reliability_test, run_reliability_tests
 
 # Configure logging
 logging.basicConfig(
@@ -184,8 +185,21 @@ Examples:
   # Run with different model
   python main.py --model-name "gpt-4" --model-base-url "https://api.openai.com/v1"
   
+  # Reliability testing - development phase (5 runs)
+  python main.py --enable-reliability-test --reliability-phase development
+  
+  # Reliability testing - deployment phase (20 runs)
+  python main.py --enable-reliability-test --reliability-phase deployment
+  
+  # Reliability testing - custom number of runs
+  python main.py --enable-reliability-test --reliability-runs 10
+  
+  # Reliability testing - specific test file
+  python main.py --enable-reliability-test --reliability-test-path "tests/base/default-jan-assistant.txt"
+  
   # Using environment variables
   ENABLE_REPORTPORTAL=true RP_TOKEN=xxx MODEL_NAME=gpt-4 python main.py
+  ENABLE_RELIABILITY_TEST=true RELIABILITY_PHASE=deployment python main.py
         """
     )
     
@@ -321,6 +335,32 @@ Examples:
         help='List available migration test cases and exit'
     )
     
+    # Reliability testing arguments
+    reliability_group = parser.add_argument_group('Reliability Testing Configuration')
+    reliability_group.add_argument(
+        '--enable-reliability-test',
+        action='store_true',
+        default=os.getenv('ENABLE_RELIABILITY_TEST', 'false').lower() == 'true',
+        help='Enable reliability testing mode (env: ENABLE_RELIABILITY_TEST, default: false)'
+    )
+    reliability_group.add_argument(
+        '--reliability-phase',
+        choices=['development', 'deployment'],
+        default=os.getenv('RELIABILITY_PHASE', 'development'),
+        help='Reliability testing phase: development (5 runs) or deployment (20 runs) (env: RELIABILITY_PHASE, default: development)'
+    )
+    reliability_group.add_argument(
+        '--reliability-runs',
+        type=int,
+        default=int(os.getenv('RELIABILITY_RUNS', '0')),
+        help='Custom number of runs for reliability testing (overrides phase setting) (env: RELIABILITY_RUNS, default: 0)'
+    )
+    reliability_group.add_argument(
+        '--reliability-test-path',
+        default=os.getenv('RELIABILITY_TEST_PATH'),
+        help='Specific test file path for reliability testing (env: RELIABILITY_TEST_PATH, if not specified, uses --tests-dir)'
+    )
+    
     args = parser.parse_args()
     
     # Handle list migration tests
@@ -407,6 +447,17 @@ async def main():
         if args.enable_migration_test:
             logger.info(f"Old version installer: {args.old_version}")
             logger.info(f"New version installer: {args.new_version}")
+        logger.info(f"Reliability testing: {'ENABLED' if args.enable_reliability_test else 'DISABLED'}")
+        if args.enable_reliability_test:
+            logger.info(f"Reliability phase: {args.reliability_phase}")
+            if args.reliability_runs > 0:
+                logger.info(f"Custom runs: {args.reliability_runs}")
+            else:
+                logger.info(f"Phase runs: {5 if args.reliability_phase == 'development' else 20}")
+            if args.reliability_test_path:
+                logger.info(f"Specific test path: {args.reliability_test_path}")
+            else:
+                logger.info(f"Tests directory: {args.tests_dir}")
         logger.info("======================")
         
         # Initialize ReportPortal client only if enabled
@@ -463,8 +514,65 @@ async def main():
         await computer.run()
         logger.info("Computer environment ready")
         
+        # Check if reliability testing is enabled
+        if args.enable_reliability_test:
+            logger.info("=" * 60)
+            logger.info("RELIABILITY TESTING MODE ENABLED")
+            logger.info("=" * 60)
+            logger.info(f"Phase: {args.reliability_phase}")
+            if args.reliability_runs > 0:
+                logger.info(f"Custom runs: {args.reliability_runs}")
+            else:
+                logger.info(f"Phase runs: {5 if args.reliability_phase == 'development' else 20}")
+            
+            # Determine test paths for reliability testing
+            if args.reliability_test_path:
+                # Use specific test path
+                if not os.path.exists(args.reliability_test_path):
+                    logger.error(f"Reliability test file not found: {args.reliability_test_path}")
+                    final_exit_code = 1
+                    return final_exit_code
+                test_paths = [args.reliability_test_path]
+                logger.info(f"Running reliability test on specific file: {args.reliability_test_path}")
+            else:
+                # Use tests directory
+                test_files = scan_test_files(args.tests_dir)
+                if not test_files:
+                    logger.warning(f"No test files found in directory: {args.tests_dir}")
+                    return
+                test_paths = [test_data['path'] for test_data in test_files]
+                logger.info(f"Running reliability tests on {len(test_paths)} test files from: {args.tests_dir}")
+            
+            # Run reliability tests
+            reliability_results = await run_reliability_tests(
+                computer=computer,
+                test_paths=test_paths,
+                rp_client=rp_client,
+                launch_id=launch_id,
+                max_turns=args.max_turns,
+                jan_app_path=args.jan_app_path,
+                jan_process_name=args.jan_process_name,
+                agent_config=agent_config,
+                enable_reportportal=args.enable_reportportal,
+                phase=args.reliability_phase,
+                runs=args.reliability_runs if args.reliability_runs > 0 else None
+            )
+            
+            # Handle reliability test results
+            if reliability_results and reliability_results.get("overall_success", False):
+                logger.info(f"[SUCCESS] Reliability testing completed successfully!")
+                final_exit_code = 0
+            else:
+                logger.error(f"[FAILED] Reliability testing failed!")
+                if reliability_results and reliability_results.get("error_message"):
+                    logger.error(f"Error: {reliability_results['error_message']}")
+                final_exit_code = 1
+            
+            # Skip regular test execution in reliability mode
+            logger.info("Reliability testing completed. Skipping regular test execution.")
+            
         # Check if migration testing is enabled
-        if args.enable_migration_test:
+        elif args.enable_migration_test:
             logger.info("=" * 60)
             logger.info("MIGRATION TESTING MODE ENABLED")
             logger.info("=" * 60)

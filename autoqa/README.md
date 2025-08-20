@@ -12,6 +12,7 @@
 - 🎯 **Flexible Configuration**: Command-line arguments and environment variables
 - 🌐 **Cross-platform**: Windows, macOS, and Linux support
 - 📁 **Test Discovery**: Automatically scans test files from directory
+- 🧪 **Reliability Testing**: Run tests multiple times to verify stability (development: 5 runs, deployment: 20 runs)
 
 ## Prerequisites
 
@@ -72,6 +73,25 @@ python main.py \
   --rp-endpoint "https://reportportal.example.com" \
   --rp-project "my_project" \
   --rp-token "YOUR_API_TOKEN"
+```
+
+### Reliability Testing
+
+```bash
+# Development phase (5 runs) - verify basic stability
+python main.py --enable-reliability-test --reliability-phase development
+
+# Deployment phase (20 runs) - verify production readiness
+python main.py --enable-reliability-test --reliability-phase deployment
+
+# Custom number of runs
+python main.py --enable-reliability-test --reliability-runs 10
+
+# Test specific file with reliability testing
+python main.py \
+  --enable-reliability-test \
+  --reliability-phase development \
+  --reliability-test-path "tests/base/default-jan-assistant.txt"
 ```
 
 ## Configuration

@@ -209,7 +209,7 @@ async def run_batch_migration_test(computer, old_version_path, new_version_path,
                     test_case_setup_success = False
                     continue
 
-                with open(setup_test_path, "r") as f:
+                with open(setup_test_path, "r", encoding="utf-8") as f:
                     setup_content = f.read()
 
                 setup_test_data = {
@@ -331,7 +331,7 @@ async def run_batch_migration_test(computer, old_version_path, new_version_path,
                     test_case_verify_success = False
                     continue
 
-                with open(verify_test_path, "r") as f:
+                with open(verify_test_path, "r", encoding="utf-8") as f:
                     verify_content = f.read()
 
                 verify_test_data = {

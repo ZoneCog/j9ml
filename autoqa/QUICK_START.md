@@ -46,6 +46,28 @@ python main.py \
   --max-turns 75
 ```
 
+### 4. Reliability Testing
+
+```bash
+# Development phase (5 runs)
+python main.py \
+  --enable-reliability-test \
+  --reliability-phase development \
+  --max-turns 40
+
+# Deployment phase (20 runs)
+python main.py \
+  --enable-reliability-test \
+  --reliability-phase deployment \
+  --max-turns 40
+
+# Custom number of runs
+python main.py \
+  --enable-reliability-test \
+  --reliability-runs 10 \
+  --max-turns 40
+```
+
 ## Test Types
 
 ### Base Test Cases
@@ -60,6 +82,11 @@ python main.py \
 - **`models`**: Test downloaded models persist after upgrade
 - **`assistants`**: Test custom assistants persist after upgrade
 - **`assistants-complete`**: Test both creation and chat functionality
+
+### Reliability Testing
+- **Development Phase**: Run test 5 times to verify basic stability (≥80% success rate)
+- **Deployment Phase**: Run test 20 times to verify production readiness (≥90% success rate)
+- **Custom Runs**: Specify custom number of runs for specific testing needs
 
 ## Common Commands
 
@@ -101,7 +128,18 @@ python main.py \
   --migration-batch-mode \
   --old-version "path/to/old.exe" \
   --new-version "path/to/new.exe"
-```
+
+# Test reliability - development phase
+python main.py \
+  --enable-reliability-test \
+  --reliability-phase development \
+  --max-turns 40
+
+# Test reliability - deployment phase
+python main.py \
+  --enable-reliability-test \
+  --reliability-phase deployment \
+  --max-turns 40
 
 ## Configuration Options
 
@@ -129,6 +167,14 @@ python main.py \
 | `--rp-token` | ReportPortal token | Yes (if RP enabled) |
 | `--rp-endpoint` | RP endpoint URL | No |
 | `--rp-project` | RP project name | No |
+
+### Reliability Testing Arguments
+| Argument | Description | Required |
+|----------|-------------|----------|
+| `--enable-reliability-test` | Enable reliability mode | Yes |
+| `--reliability-phase` | Testing phase (development/deployment) | No |
+| `--reliability-runs` | Custom number of runs | No |
+| `--reliability-test-path` | Specific test file path | No |
 
 ## Environment Variables
 
@@ -177,6 +223,19 @@ python main.py \
   --enable-reportportal \
   --rp-token "YOUR_TOKEN" \
   --rp-project "jan_migration_tests"
+```
+
+### Example 4: Reliability Testing
+```bash
+# Test reliability with deployment phase
+python main.py \
+  --enable-reliability-test \
+  --reliability-phase deployment \
+  --reliability-test-path "tests/base/default-jan-assistant.txt" \
+  --max-turns 50 \
+  --enable-reportportal \
+  --rp-token "YOUR_TOKEN" \
+  --rp-project "jan_reliability_tests"
 ```
 
 ## Troubleshooting

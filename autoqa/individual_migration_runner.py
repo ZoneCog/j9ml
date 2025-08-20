@@ -101,7 +101,7 @@ async def run_individual_migration_test(computer, test_case_key, old_version_pat
         if not os.path.exists(setup_test_path):
             raise FileNotFoundError(f"Setup test file not found: {setup_test_path}")
         
-        with open(setup_test_path, "r") as f:
+        with open(setup_test_path, "r", encoding="utf-8") as f:
             setup_content = f.read()
         
         setup_test_data = {
@@ -151,7 +151,7 @@ async def run_individual_migration_test(computer, test_case_key, old_version_pat
         if not os.path.exists(verify_test_path):
             raise FileNotFoundError(f"Verification test file not found: {verify_test_path}")
         
-        with open(verify_test_path, "r") as f:
+        with open(verify_test_path, "r", encoding="utf-8") as f:
             verify_content = f.read()
         
         verify_test_data = {
