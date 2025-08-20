@@ -18,12 +18,12 @@ on:
         description: 'Ubuntu .deb URL path'
         required: true
         type: string
-        default: 'https://delta.jan.ai/nightly/Jan-nightly_0.6.4-728_amd64.deb'
+        default: 'https://catalog.jan.ai/linux/Jan_0.6.8_amd64.deb'
       jan_app_macos_source:
         description: 'macOS .dmg URL path'
         required: true
         type: string
-        default: 'https://delta.jan.ai/nightly/Jan-nightly_0.6.4-728_universal.dmg'
+        default: 'https://catalog.jan.ai/macos/Jan_0.6.8_universal.dmg'
       is_nightly:
         description: 'Is the app a nightly build?'
         required: true
@@ -37,7 +37,7 @@ on:
         default: development
       reliability_runs:
         description: 'Custom runs (0 uses phase default)'
-        required: true
+        required: false
         type: number
         default: 0
       reliability_test_path:
@@ -119,3 +119,194 @@ jobs:
         shell: powershell
         run: |
           .\autoqa\scripts\windows_post_cleanup.ps1 -IsNightly "${{ inputs.is_nightly }}"
+
+  reliability-ubuntu:
+    runs-on: ubuntu-22-04-nvidia-gpu
+    timeout-minutes: 60
+    env:
+      DEFAULT_JAN_APP_URL: 'https://catalog.jan.ai/linux/Jan_0.6.8_amd64.deb'
+      DEFAULT_IS_NIGHTLY: 'false'
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Python 3.13
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.13'
+
+      - name: Install system dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y \
+            x11-utils \
+            python3-tk \
+            python3-dev \
+            wmctrl \
+            xdotool \
+            libnss3-dev \
+            libgconf-2-4 \
+            libxss1 \
+            libasound2 \
+            libxtst6 \
+            libgtk-3-0 \
+            libgbm-dev \
+            libxshmfence1 \
+            libxrandr2 \
+            libpangocairo-1.0-0 \
+            libatk1.0-0 \
+            libcairo-gobject2 \
+            libgdk-pixbuf2.0-0 \
+            gnome-screenshot
+
+      - name: Setup script permissions
+        run: |
+          chmod +x autoqa/scripts/setup_permissions.sh
+          ./autoqa/scripts/setup_permissions.sh
+
+      - name: Clean existing Jan installations
+        run: |
+          ./autoqa/scripts/ubuntu_cleanup.sh
+
+      - name: Download/Prepare Jan app
+        run: |
+          ./autoqa/scripts/ubuntu_download.sh \
+            "${{ inputs.jan_app_ubuntu_source }}" \
+            "${{ inputs.is_nightly }}" \
+            "${{ vars.JAN_APP_URL_LINUX }}" \
+            "${{ vars.IS_NIGHTLY }}" \
+            "$DEFAULT_JAN_APP_URL" \
+            "$DEFAULT_IS_NIGHTLY"
+          # Set env for install and runtime
+          echo "JAN_APP_PATH=/tmp/jan-installer.deb" >> $GITHUB_ENV
+          if [ "${{ inputs.is_nightly }}" = "true" ]; then
+            echo "JAN_PROCESS_NAME=Jan-nightly" >> $GITHUB_ENV
+            echo "RUNTIME_JAN_BIN=/usr/bin/Jan-nightly" >> $GITHUB_ENV
+          else
+            echo "JAN_PROCESS_NAME=Jan" >> $GITHUB_ENV
+            echo "RUNTIME_JAN_BIN=/usr/bin/Jan" >> $GITHUB_ENV
+          fi
+
+      - name: Install Jan app
+        run: |
+          ./autoqa/scripts/ubuntu_install.sh "$IS_NIGHTLY"
+
+      - name: Install Python dependencies
+        working-directory: autoqa
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+
+      - name: Run reliability tests
+        working-directory: autoqa
+        env:
+          DISPLAY: ${{ env.DISPLAY }}
+        run: |
+          runs="${{ inputs.reliability_runs }}"
+          runsArg=""
+          if [ "${runs}" -gt 0 ]; then runsArg="--reliability-runs ${runs}"; fi
+          processName="${JAN_PROCESS_NAME}"
+          janBin="${RUNTIME_JAN_BIN}"
+          python main.py --enable-reliability-test --reliability-phase "${{ inputs.reliability_phase }}" --reliability-test-path "${{ inputs.reliability_test_path }}" ${runsArg} --jan-process-name "${processName}" --jan-app-path "${janBin}"
+
+      - name: Upload screen recordings
+        if: always()
+        uses: actions/upload-artifact@v4
+        continue-on-error: true
+        with:
+          name: reliability-recordings-${{ github.run_number }}-ubuntu
+          path: autoqa/recordings/
+
+      - name: Upload trajectories
+        if: always()
+        uses: actions/upload-artifact@v4
+        continue-on-error: true
+        with:
+          name: reliability-trajectories-${{ github.run_number }}-ubuntu
+          path: autoqa/trajectories/
+  
+      - name: Cleanup after tests
+        if: always()
+        run: |
+          ./autoqa/scripts/ubuntu_post_cleanup.sh "$IS_NIGHTLY"
+
+  reliability-macos:
+    runs-on: macos-selfhosted-15-arm64-cua
+    timeout-minutes: 60
+    env:
+      DEFAULT_JAN_APP_URL: 'https://catalog.jan.ai/macos/Jan_0.6.8_universal.dmg'
+      DEFAULT_IS_NIGHTLY: 'false'
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Python 3.13
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.13'
+
+      - name: Setup script permissions
+        run: |
+          chmod +x autoqa/scripts/setup_permissions.sh
+          ./autoqa/scripts/setup_permissions.sh
+
+      - name: Clean existing Jan installations
+        run: |
+          ./autoqa/scripts/macos_cleanup.sh
+
+      - name: Download/Prepare Jan app
+        run: |
+          ./autoqa/scripts/macos_download.sh \
+            "${{ inputs.jan_app_macos_source }}" \
+            "${{ inputs.is_nightly }}" \
+            "${{ vars.JAN_APP_URL }}" \
+            "${{ vars.IS_NIGHTLY }}" \
+            "$DEFAULT_JAN_APP_URL" \
+            "$DEFAULT_IS_NIGHTLY"
+          echo "JAN_APP_PATH=/tmp/jan-installer.dmg" >> $GITHUB_ENV
+          if [ "${{ inputs.is_nightly }}" = "true" ]; then
+            echo "PROCESS_NAME=Jan-nightly" >> $GITHUB_ENV
+            echo "RUNTIME_JAN_BIN=/Applications/Jan-nightly.app/Contents/MacOS/Jan-nightly" >> $GITHUB_ENV
+          else
+            echo "PROCESS_NAME=Jan" >> $GITHUB_ENV
+            echo "RUNTIME_JAN_BIN=/Applications/Jan.app/Contents/MacOS/Jan" >> $GITHUB_ENV
+          fi
+
+      - name: Install Jan app
+        run: |
+          ./autoqa/scripts/macos_install.sh
+
+      - name: Install Python dependencies
+        working-directory: autoqa
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+
+      - name: Run reliability tests
+        working-directory: autoqa
+        run: |
+          runs="${{ inputs.reliability_runs }}"
+          runsArg=""
+          if [ "${runs}" -gt 0 ]; then runsArg="--reliability-runs ${runs}"; fi
+          python main.py --enable-reliability-test --reliability-phase "${{ inputs.reliability_phase }}" --reliability-test-path "${{ inputs.reliability_test_path }}" ${runsArg} --jan-process-name "${PROCESS_NAME}" --jan-app-path "${RUNTIME_JAN_BIN}"
+
+      - name: Upload screen recordings
+        if: always()
+        uses: actions/upload-artifact@v4
+        continue-on-error: true
+        with:
+          name: reliability-recordings-${{ github.run_number }}-macos
+          path: autoqa/recordings/
+
+      - name: Upload trajectories
+        if: always()
+        uses: actions/upload-artifact@v4
+        continue-on-error: true
+        with:
+          name: reliability-trajectories-${{ github.run_number }}-macos
+          path: autoqa/trajectories/
+
+      - name: Cleanup after tests
+        if: always()
+        run: |
+          ./autoqa/scripts/macos_post_cleanup.sh
