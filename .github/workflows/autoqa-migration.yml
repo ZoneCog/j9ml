@@ -107,7 +107,7 @@ jobs:
         shell: powershell
         env:
           RP_TOKEN: ${{ secrets.RP_TOKEN }}
-          ENABLE_REPORTPORTAL: 'true'
+          ENABLE_REPORTPORTAL: 'false'
           RP_ENDPOINT: 'https://reportportal.menlo.ai'
           RP_PROJECT: 'default_personal'
         run: |
@@ -223,11 +223,9 @@ jobs:
         working-directory: autoqa
         run: |
           case="${{ inputs.migration_test_case }}"
-          if [ -n "${case}" ]; then
-            xvfb-run -a python main.py --enable-migration-test --old-version "${OLD_VERSION}" --new-version "${NEW_VERSION}" --max-turns ${{ inputs.max_turns }} --migration-test-case "${case}"
-          else
-            xvfb-run -a python main.py --enable-migration-test --old-version "${OLD_VERSION}" --new-version "${NEW_VERSION}" --max-turns ${{ inputs.max_turns }}
-          fi
+          caseArg=""
+          if [ -n "${case}" ]; then caseArg="--migration-test-case \"${case}\""; fi
+          xvfb-run -a python main.py --enable-migration-test --old-version "${OLD_VERSION}" --new-version "${NEW_VERSION}" --max-turns ${{ inputs.max_turns }} ${caseArg}
 
       - name: Upload screen recordings
         if: always()
@@ -308,11 +306,9 @@ jobs:
         working-directory: autoqa
         run: |
           case="${{ inputs.migration_test_case }}"
-          if [ -n "${case}" ]; then
-            python main.py --enable-migration-test --old-version "${OLD_VERSION}" --new-version "${NEW_VERSION}" --max-turns ${{ inputs.max_turns }} --migration-test-case "${case}"
-          else
-            python main.py --enable-migration-test --old-version "${OLD_VERSION}" --new-version "${NEW_VERSION}" --max-turns ${{ inputs.max_turns }}
-          fi
+          caseArg=""
+          if [ -n "${case}" ]; then caseArg="--migration-test-case \"${case}\""; fi
+          python main.py --enable-migration-test --old-version "${OLD_VERSION}" --new-version "${NEW_VERSION}" --max-turns ${{ inputs.max_turns }} ${caseArg}
 
       - name: Upload screen recordings
         if: always()
