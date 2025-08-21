@@ -110,9 +110,11 @@ jobs:
           RP_PROJECT: 'default_personal'
         run: |
           $case = "${{ inputs.migration_test_case }}"
-          $caseArg = ""
-          if ($case -and $case.Trim() -ne "") { $caseArg = "--migration-test-case `"$case`"" }
-          python main.py --enable-migration-test --old-version "$env:OLD_VERSION" --new-version "$env:NEW_VERSION" --max-turns ${{ inputs.max_turns }} $caseArg
+          if ($case -and $case.Trim() -ne "") {
+            python main.py --enable-migration-test --old-version "$env:OLD_VERSION" --new-version "$env:NEW_VERSION" --max-turns ${{ inputs.max_turns }} --migration-test-case $case
+          } else {
+            python main.py --enable-migration-test --old-version "$env:OLD_VERSION" --new-version "$env:NEW_VERSION" --max-turns ${{ inputs.max_turns }}
+          }
 
       - name: Upload screen recordings
         if: always()
@@ -219,9 +221,11 @@ jobs:
         working-directory: autoqa
         run: |
           case="${{ inputs.migration_test_case }}"
-          caseArg=""
-          if [ -n "${case}" ]; then caseArg="--migration-test-case \"${case}\""; fi
-          xvfb-run -a python main.py --enable-migration-test --old-version "${OLD_VERSION}" --new-version "${NEW_VERSION}" --max-turns ${{ inputs.max_turns }} ${caseArg}
+          if [ -n "${case}" ]; then
+            xvfb-run -a python main.py --enable-migration-test --old-version "${OLD_VERSION}" --new-version "${NEW_VERSION}" --max-turns ${{ inputs.max_turns }} --migration-test-case "${case}"
+          else
+            xvfb-run -a python main.py --enable-migration-test --old-version "${OLD_VERSION}" --new-version "${NEW_VERSION}" --max-turns ${{ inputs.max_turns }}
+          fi
 
       - name: Upload screen recordings
         if: always()
@@ -302,9 +306,11 @@ jobs:
         working-directory: autoqa
         run: |
           case="${{ inputs.migration_test_case }}"
-          caseArg=""
-          if [ -n "${case}" ]; then caseArg="--migration-test-case \"${case}\""; fi
-          python main.py --enable-migration-test --old-version "${OLD_VERSION}" --new-version "${NEW_VERSION}" --max-turns ${{ inputs.max_turns }} ${caseArg}
+          if [ -n "${case}" ]; then
+            python main.py --enable-migration-test --old-version "${OLD_VERSION}" --new-version "${NEW_VERSION}" --max-turns ${{ inputs.max_turns }} --migration-test-case "${case}"
+          else
+            python main.py --enable-migration-test --old-version "${OLD_VERSION}" --new-version "${NEW_VERSION}" --max-turns ${{ inputs.max_turns }}
+          fi
 
       - name: Upload screen recordings
         if: always()
