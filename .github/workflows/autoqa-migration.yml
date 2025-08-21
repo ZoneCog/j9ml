@@ -305,7 +305,28 @@ jobs:
 
           echo "OLD_VERSION=/tmp/jan-old.dmg" >> $GITHUB_ENV
           echo "NEW_VERSION=/tmp/jan-new.dmg" >> $GITHUB_ENV
+      - name: Install system dependencies
+        run: |
+          echo "Installing system dependencies for macOS..."
 
+          # Check if Homebrew is available
+          if command -v brew >/dev/null 2>&1; then
+            echo "Homebrew is available"
+            
+            # Install python-tk if not available
+            python3 -c "import tkinter" 2>/dev/null || {
+              echo "Installing python-tk via Homebrew..."
+              brew install python-tk || true
+            }
+          else
+            echo "Homebrew not available, checking if tkinter works..."
+            python3 -c "import tkinter" || {
+              echo "[WARNING] tkinter not available and Homebrew not found"
+              echo "This may cause issues with mouse control"
+            }
+          fi
+
+          echo "System dependencies check completed"
       - name: Install Python dependencies
         working-directory: autoqa
         run: |
