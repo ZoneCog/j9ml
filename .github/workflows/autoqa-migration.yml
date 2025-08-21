@@ -182,6 +182,7 @@ jobs:
             libcairo-gobject2 \
             libgdk-pixbuf2.0-0 \
             gnome-screenshot \
+            libwebkit2gtk-4.1-0 \
             xvfb
 
       - name: Setup script permissions
@@ -255,7 +256,7 @@ jobs:
       - name: Cleanup after tests
         if: always()
         run: |
-          ./autoqa/scripts/ubuntu_post_cleanup.sh "false"
+          ./autoqa/scripts/ubuntu_post_cleanup.sh "${{ inputs.is_nightly }}"
 
   migration-macos:
     if: inputs.old_macos_installer != '' && inputs.new_macos_installer != ''
