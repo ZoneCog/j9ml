@@ -3,6 +3,11 @@ name: AutoQA Migration (Manual)
 on:
   workflow_dispatch:
     inputs:
+      is_nightly:
+        description: 'Is the app a nightly build?'
+        required: true
+        type: boolean
+        default: false
       old_windows_installer:
         description: 'Windows OLD installer URL or path (.exe)'
         required: true
@@ -17,22 +22,22 @@ on:
         description: 'Ubuntu OLD installer URL or path (.deb)'
         required: false
         type: string
-        default: ''
+        default: 'https://catalog.jan.ai/linux/Jan_0.6.7_amd64.deb'
       new_ubuntu_installer:
         description: 'Ubuntu NEW installer URL or path (.deb)'
         required: false
         type: string
-        default: ''
+        default: 'https://catalog.jan.ai/linux/Jan_0.6.8_amd64.deb'
       old_macos_installer:
         description: 'macOS OLD installer URL or path (.dmg)'
         required: false
         type: string
-        default: ''
+        default: 'https://catalog.jan.ai/macos/Jan_0.6.7_universal.dmg'
       new_macos_installer:
         description: 'macOS NEW installer URL or path (.dmg)'
         required: false
         type: string
-        default: ''
+        default: 'https://catalog.jan.ai/macos/Jan_0.6.8_universal.dmg'
       migration_test_case:
         description: 'Specific migration test case key (leave empty to run all)'
         required: false
@@ -60,7 +65,7 @@ jobs:
       - name: Clean existing Jan installations
         shell: powershell
         run: |
-          .\autoqa\scripts\windows_cleanup.ps1 -IsNightly $false
+          .\autoqa\scripts\windows_cleanup.ps1 -IsNightly "${{ inputs.is_nightly }}"
 
       - name: Download OLD and NEW installers
         shell: powershell
@@ -68,7 +73,7 @@ jobs:
           # Download OLD installer using existing script
           .\autoqa\scripts\windows_download.ps1 `
             -WorkflowInputUrl "${{ inputs.old_windows_installer }}" `
-            -WorkflowInputIsNightly "false" `
+            -WorkflowInputIsNightly "${{ inputs.is_nightly }}" `
             -RepoVariableUrl "" `
             -RepoVariableIsNightly "" `
             -DefaultUrl "" `
@@ -81,7 +86,7 @@ jobs:
           # Download NEW installer using existing script
           .\autoqa\scripts\windows_download.ps1 `
             -WorkflowInputUrl "${{ inputs.new_windows_installer }}" `
-            -WorkflowInputIsNightly "false" `
+            -WorkflowInputIsNightly "${{ inputs.is_nightly }}" `
             -RepoVariableUrl "" `
             -RepoVariableIsNightly "" `
             -DefaultUrl "" `
@@ -107,15 +112,16 @@ jobs:
         shell: powershell
         env:
           RP_TOKEN: ${{ secrets.RP_TOKEN }}
-          ENABLE_REPORTPORTAL: 'false'
+          ENABLE_REPORTPORTAL: 'true'
           RP_ENDPOINT: 'https://reportportal.menlo.ai'
           RP_PROJECT: 'default_personal'
         run: |
           $case = "${{ inputs.migration_test_case }}"
+          $procName = if ("${{ inputs.is_nightly }}" -eq "true") { "Jan-nightly.exe" } else { "Jan.exe" }
           if ($case -and $case.Trim() -ne "") {
-            python main.py --enable-migration-test --old-version "$env:OLD_VERSION" --new-version "$env:NEW_VERSION" --max-turns ${{ inputs.max_turns }} --migration-test-case $case
+            python main.py --enable-migration-test --old-version "$env:OLD_VERSION" --new-version "$env:NEW_VERSION" --max-turns ${{ inputs.max_turns }} --jan-process-name "$procName" --migration-test-case $case
           } else {
-            python main.py --enable-migration-test --old-version "$env:OLD_VERSION" --new-version "$env:NEW_VERSION" --max-turns ${{ inputs.max_turns }}
+            python main.py --enable-migration-test --old-version "$env:OLD_VERSION" --new-version "$env:NEW_VERSION" --max-turns ${{ inputs.max_turns }} --jan-process-name "$procName"
           }
 
       - name: Upload screen recordings
@@ -138,7 +144,7 @@ jobs:
         if: always()
         shell: powershell
         run: |
-          .\autoqa\scripts\windows_post_cleanup.ps1 -IsNightly $false
+          .\autoqa\scripts\windows_post_cleanup.ps1 -IsNightly "${{ inputs.is_nightly }}"
 
   migration-ubuntu:
     if: inputs.old_ubuntu_installer != '' && inputs.new_ubuntu_installer != ''
@@ -193,7 +199,7 @@ jobs:
           # Download OLD installer using existing script
           ./autoqa/scripts/ubuntu_download.sh \
             "${{ inputs.old_ubuntu_installer }}" \
-            "false" \
+            "${{ inputs.is_nightly }}" \
             "" \
             "" \
             "" \
@@ -203,7 +209,7 @@ jobs:
           # Download NEW installer using existing script
           ./autoqa/scripts/ubuntu_download.sh \
             "${{ inputs.new_ubuntu_installer }}" \
-            "false" \
+            "${{ inputs.is_nightly }}" \
             "" \
             "" \
             "" \
@@ -223,9 +229,12 @@ jobs:
         working-directory: autoqa
         run: |
           case="${{ inputs.migration_test_case }}"
-          caseArg=""
-          if [ -n "${case}" ]; then caseArg="--migration-test-case \"${case}\""; fi
-          xvfb-run -a python main.py --enable-migration-test --old-version "${OLD_VERSION}" --new-version "${NEW_VERSION}" --max-turns ${{ inputs.max_turns }} ${caseArg}
+          procName=$([ "${{ inputs.is_nightly }}" = "true" ] && echo "Jan-nightly" || echo "Jan")
+          if [ -n "${case}" ]; then
+            xvfb-run -a python main.py --enable-migration-test --old-version "${OLD_VERSION}" --new-version "${NEW_VERSION}" --max-turns ${{ inputs.max_turns }} --jan-process-name "${procName}" --migration-test-case "${case}"
+          else
+            xvfb-run -a python main.py --enable-migration-test --old-version "${OLD_VERSION}" --new-version "${NEW_VERSION}" --max-turns ${{ inputs.max_turns }} --jan-process-name "${procName}"
+          fi
 
       - name: Upload screen recordings
         if: always()
@@ -276,7 +285,7 @@ jobs:
           # Download OLD installer using existing script
           ./autoqa/scripts/macos_download.sh \
             "${{ inputs.old_macos_installer }}" \
-            "false" \
+            "${{ inputs.is_nightly }}" \
             "" \
             "" \
             "" \
@@ -286,7 +295,7 @@ jobs:
           # Download NEW installer using existing script
           ./autoqa/scripts/macos_download.sh \
             "${{ inputs.new_macos_installer }}" \
-            "false" \
+            "${{ inputs.is_nightly }}" \
             "" \
             "" \
             "" \
@@ -306,9 +315,12 @@ jobs:
         working-directory: autoqa
         run: |
           case="${{ inputs.migration_test_case }}"
-          caseArg=""
-          if [ -n "${case}" ]; then caseArg="--migration-test-case \"${case}\""; fi
-          python main.py --enable-migration-test --old-version "${OLD_VERSION}" --new-version "${NEW_VERSION}" --max-turns ${{ inputs.max_turns }} ${caseArg}
+          procName=$([ "${{ inputs.is_nightly }}" = "true" ] && echo "Jan-nightly" || echo "Jan")
+          if [ -n "${case}" ]; then
+            python main.py --enable-migration-test --old-version "${OLD_VERSION}" --new-version "${NEW_VERSION}" --max-turns ${{ inputs.max_turns }} --jan-process-name "${procName}" --migration-test-case "${case}"
+          else
+            python main.py --enable-migration-test --old-version "${OLD_VERSION}" --new-version "${NEW_VERSION}" --max-turns ${{ inputs.max_turns }} --jan-process-name "${procName}"
+          fi
 
       - name: Upload screen recordings
         if: always()
