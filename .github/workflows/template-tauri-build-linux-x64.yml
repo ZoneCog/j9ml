@@ -90,6 +90,8 @@ jobs:
         uses: actions/setup-node@v1
         with:
           node-version: 20
+      - name: Setup Rust
+        uses: dtolnay/rust-toolchain@stable
 
       - name: Install jq
         uses: dcarbone/install-jq-action@v2.0.1
