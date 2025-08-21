@@ -162,7 +162,7 @@ Ensure that the following section information show up for hardware
 - [x] User can `Start Server` and chat with the default endpoint
 	- [x] User should see the correct model name at `v1/models`
 	- [x] User should be able to chat with it at `v1/chat/completions`
-- [x] `Open Logs` show the correct query log send to the server and return from the server
+- [x] `Open Logs` show the correct query log send to the server and return from the server ✅
 - [x] Make sure that changing all the parameter in `Server Configuration` is reflected when `Start Server`
 
 #### In `HTTPS Proxy`:
@@ -171,7 +171,7 @@ Ensure that the following section information show up for hardware
 ## C. Hub
 - [x] User can click `Download` to download a model ✅
 - [x] User can cancel a model in the middle of downloading 🔥🔥🔥
-- [x] User can add a Hugging Face model detail to the list by pasting a model name / model url into the search bar and press enter 🔥
+- [x] User can add a Hugging Face model detail to the list by pasting a model name / model url into the search bar and press enter ✅
 - [x] Clicking on a listing will open up the model card information within Jan and render the HTML properly
 - [x] Clicking download work on the `Show variants` section 🔥🔥🔥
 - [x] Clicking download work inside the Model card HTML 🔥🔥🔥

@@ -1,0 +1,52 @@
+prompt = """
+
+You are a GUI agent. You are given a task and your action history, with screenshots. You need to perform the next action to complete the task. 
+
+## Output Format
+```\nThought: ...
+Action: ...\n```
+
+## Action Space
+
+click(start_box='<|box_start|>(x1,y1)<|box_end|>')
+left_double(start_box='<|box_start|>(x1,y1)<|box_end|>')
+right_single(start_box='<|box_start|>(x1,y1)<|box_end|>')
+drag(start_box='<|box_start|>(x1,y1)<|box_end|>', end_box='<|box_start|>(x3,y3)<|box_end|>')
+hotkey(key='')
+type(content='') #If you want to submit your input, use \"\\
+\" at the end of `content`.
+scroll(start_box='<|box_start|>(x1,y1)<|box_end|>', direction='down or up or right or left')
+wait() #Sleep for 5s and take a screenshot to check for any changes.
+finished()
+call_user() # Submit the task and call the user when the task is unsolvable, or when you need the user's help.
+
+## Note
+- Use Chinese in `Thought` part.
+- Summarize your next action (with its target element) in `Thought` part.
+
+## User Instruction
+
+You are going to verify that the **Local API Server** can start and logs are displayed correctly.
+
+Steps:
+1. If a dialog appears in the bottom-right corner titled **"Help Us Improve Jan"**, click **Deny** to dismiss it before continuing.
+2. In the bottom-left menu, click **Settings**.
+3. In the left sidebar, click on **Local API Server**.
+4. Under **Server Configuration**, type `"1234"` into the **API Key** field **if the field is empty**, otherwise ignore this step.
+5. Click the **Start Server** button in the Local API Server section.
+6. In the **Server Logs** area, click **Open Logs**.
+7. Verification rule:
+   - If the logs window shows entries such as `INFO Jan API server started on http://127.0.0.1:1337` (or similar log lines confirming the server started), consider the check **passed**.
+
+CRITICAL INSTRUCTIONS FOR FINAL RESPONSE:
+- You MUST respond in English only, not any other language.
+- You MUST return ONLY the JSON format below, nothing else.
+- Do NOT add any explanations, thoughts, or additional text.
+
+   If the server logs window shows that the server started (e.g., contains an INFO startup log), return: {"result": True}.
+   Otherwise, return: {"result": False}.
+
+IMPORTANT:
+- Your response must be ONLY the JSON above.
+- Do NOT add any other text before or after the JSON.
+"""
