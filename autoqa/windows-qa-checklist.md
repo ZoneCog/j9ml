@@ -29,13 +29,13 @@ Before testing, set-up the following in the old version to make sure that we can
 - [x] Custom Provider Set-up
 
 #### In `Hub`:
-- [x] Can see model from HF listed properly 🔥
+- [x] Can see model from HF listed properly ✅
 - [x] Downloaded model will show `Use` instead of `Download` ✅
 - [x] Toggling on `Downloaded` on the right corner show the correct list of downloaded models 🔥🔥
 
 #### In `Settings -> General`:
 - [x] Ensure the `App Data` path is the same ✅ 
-- [x] Click Open Logs, App Log will show 🔥
+- [x] Click Open Logs, App Log will show ✅
 	
 #### In `Settings -> Model Providers`:
 - [x] Llama.cpp still listed downloaded models and user can chat with the models 🔥🔥🔥
