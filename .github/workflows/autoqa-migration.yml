@@ -7,10 +7,12 @@ on:
         description: 'Windows OLD installer URL or path (.exe)'
         required: true
         type: string
+        default: 'https://catalog.jan.ai/windows/Jan_0.6.7_x64-setup.exe'
       new_windows_installer:
         description: 'Windows NEW installer URL or path (.exe)'
         required: true
         type: string
+        default: 'https://catalog.jan.ai/windows/Jan_0.6.8_x64-setup.exe'
       old_ubuntu_installer:
         description: 'Ubuntu OLD installer URL or path (.deb)'
         required: false
