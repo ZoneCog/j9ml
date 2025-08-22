@@ -173,8 +173,8 @@ Ensure that the following section information show up for hardware
 - [x] User can cancel a model in the middle of downloading 🔥🔥🔥
 - [x] User can add a Hugging Face model detail to the list by pasting a model name / model url into the search bar and press enter ✅
 - [x] Clicking on a listing will open up the model card information within Jan and render the HTML properly
-- [x] Clicking download work on the `Show variants` section 🔥🔥🔥
-- [x] Clicking download work inside the Model card HTML 🔥🔥🔥
+- [x] Clicking download work on the `Show variants` section ✅
+- [x] Clicking download work inside the Model card HTML ✅
 
 ## D. Threads
 

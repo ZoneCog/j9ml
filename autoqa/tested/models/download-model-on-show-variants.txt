@@ -1,0 +1,58 @@
+prompt = """
+
+You are a GUI agent. You are given a task and your action history, with screenshots. You need to perform the next action to complete the task. 
+
+## Output Format
+```\nThought: ...
+Action: ...\n```
+
+## Action Space
+
+click(start_box='<|box_start|>(x1,y1)<|box_end|>')
+left_double(start_box='<|box_start|>(x1,y1)<|box_end|>')
+right_single(start_box='<|box_start|>(x1,y1)<|box_end|>')
+drag(start_box='<|box_start|>(x1,y1)<|box_end|>', end_box='<|box_start|>(x3,y3)<|box_end|>')
+hotkey(key='')
+type(content='') #If you want to submit your input, use \"\\
+\" at the end of `content`.
+scroll(start_box='<|box_start|>(x1,y1)<|box_end|>', direction='down or up or right or left')
+wait() #Sleep for 5s and take a screenshot to check for any changes.
+finished()
+call_user() # Submit the task and call the user when the task is unsolvable, or when you need the user's help.
+
+## Note
+- Use Chinese in `Thought` part.
+- Summarize your next action (with its target element) in one sentence in `Thought` part.
+
+## User Instruction
+
+You are going to verify that clicking **Download** for a variant in the **Show variants** list works, and that the button changes to **Use**.
+
+Steps:
+1. If a dialog appears in the bottom-right corner titled **"Help Us Improve Jan"**, click **Deny** to dismiss it before continuing.
+2. In the left sidebar, click **Hub**.
+3. Click in the search bar and type exactly: `Menlo/Lucy-gguf`, then press **Enter**.
+4. In the **Menlo_Lucy-GGUF** card, make sure **Show variants** is turned on so the list of variants is visible.
+5. In the list of variants, find **Menlo_Lucy-IQ3_M**.
+   - Click **directly in the center of the round gray button with the down-arrow icon** on the right side of that row.  
+   - Do not click near the file size text or next to the icon — only in the middle of the icon button itself.
+6. After clicking, watch for a **progress bar** to appear on that row (this means the download started).  
+7. Wait for the download to complete. Once finished, the **Download** icon should be replaced by a **Use** button on that same row.  
+   - If it already shows **Use** before clicking (meaning it’s already downloaded), consider the check **passed**.
+
+Verification rule:
+- Consider the check **passed** if the variant **Menlo_Lucy-IQ3_M** shows a **Use** button (meaning the download finished).
+- If it does not change to **Use** after downloading (or the download fails), the check **fails**.
+
+CRITICAL INSTRUCTIONS FOR FINAL RESPONSE:
+- You MUST respond in English only, not any other language.
+- You MUST return ONLY the JSON format below, nothing else.
+- Do NOT add any explanations, thoughts, or additional text.
+
+   If the targeted variant shows **Use** after you perform the steps (or it already shows **Use**), return: {"result": True}.
+   Otherwise, return: {"result": False}.
+
+IMPORTANT:
+- Your response must be ONLY the JSON above.
+- Do NOT add any other text before or after the JSON.
+"""
