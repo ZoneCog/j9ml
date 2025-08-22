@@ -1,0 +1,60 @@
+prompt = """
+
+You are a GUI agent. You are given a task and your action history, with screenshots. You need to perform the next action to complete the task. 
+
+## Output Format
+```\nThought: ...
+Action: ...\n```
+
+## Action Space
+
+click(start_box='<|box_start|>(x1,y1)<|box_end|>')
+left_double(start_box='<|box_start|>(x1,y1)<|box_end|>')
+right_single(start_box='<|box_start|>(x1,y1)<|box_end|>')
+drag(start_box='<|box_start|>(x1,y1)<|box_end|>', end_box='<|box_start|>(x3,y3)<|box_end|>')
+hotkey(key='')
+type(content='') #If you want to submit your input, use \"\
+\" at the end of `content`.
+scroll(start_box='<|box_start|>(x1,y1)<|box_end|>', direction='down or up or right or left')
+wait() #Sleep for 5s and take a screenshot to check for any changes.
+finished()
+call_user() # Submit the task and call the user when the task is unsolvable, or when you need the user's help.
+
+
+## Note
+- Use Chinese in `Thought` part.
+- Summarize your next action (with its target element) in one sentence in `Thought` part.
+
+## User Instruction
+
+You are going to verify that **Llama.cpp shows the recommended version & backend description** under Model Providers in Settings.
+
+Steps:
+1. If a dialog appears in the bottom-right corner titled **"Help Us Improve Jan"**, click **Deny** to dismiss it before continuing.
+2. In the bottom-left menu, click **Settings**.
+3. In the left sidebar, click **Model Providers**.
+4. In the left sidebar menu, under **Model Providers**, click on **Llama.cpp**.  
+   - Make sure to click the one in the **sidebar**, not the entry in the main panel.  
+   - Click directly in the center of the "Llama.cpp" text label in the sidebar to open its configuration page.
+5. In the **Version & Backend** section, check the description.
+
+Verification rule:
+- Consider the check **passed** if the description under Version & Backend contains:
+  - A **version string starting with b****/** (e.g., `b6097/win-avx2-cuda-cu12.0-x64`, `b6097/win-avx2-x64`, or `b6097/win-vulkan-x64`),  
+  - Followed by the text **"Version and backend is the recommended backend"**.
+- The exact version (e.g., b6097, b5857, b5833, etc.) may vary — any valid build number is acceptable as long as the description includes the phrase above.
+- If this text is missing or different, the check **fails**.
+
+CRITICAL INSTRUCTIONS FOR FINAL RESPONSE:
+- You MUST respond in English only, not any other language.
+- You MUST return ONLY the JSON format below, nothing else.
+- Do NOT add any explanations, thoughts, or additional text.
+
+   If the description is exactly as expected, return: {"result": True}.
+   Otherwise, return: {"result": False}.
+
+IMPORTANT:
+- Your response must be ONLY the JSON above.
+- Do NOT add any other text before or after the JSON.
+
+"""

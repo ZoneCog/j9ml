@@ -88,7 +88,7 @@ In `Llama.cpp`:
 - [x] Disable `Auto-Unload Old Models`, and ensure that multiple models can run at the same time.
 - [x] Enable  `Context Shift` and ensure that context can run for long without encountering memory error. Use the `banana test` by turn on fetch MCP => ask local model to fetch and summarize the history of banana (banana has a very long history on wiki it turns out). It should run out of context memory sufficiently fast if `Context Shift` is not enabled.
 - [x] [New] Ensure that user can change the Jinja chat template of individual model and it doesn't affect the template of other model
-- [x] [New] Ensure that there is a recommended `llama.cpp` for each system and that it works out of the box for users. 🔥
+- [x] [New] Ensure that there is a recommended `llama.cpp` for each system and that it works out of the box for users. ✅
 
 In Remote Model Providers:
 - [x] Check that the following providers are presence:
