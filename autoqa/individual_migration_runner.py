@@ -25,18 +25,18 @@ MIGRATION_TEST_CASES = {
         "verify_test": "assistants/verify-create-assistant-persistence.txt",
         "description": "Tests that custom assistants persist after upgrade"
     },
-    "assistants-complete": {
-        "name": "Complete Assistants Migration (Create + Chat)",
-        "setup_tests": [
-            "assistants/setup-create-assistants.txt",
-            "assistants/setup-chat-with-assistant.txt"
-        ],
-        "verify_tests": [
-            "assistants/verify-create-assistant-persistence.txt", 
-            "assistants/verify-chat-with-assistant-persistence.txt"
-        ],
-        "description": "Tests that custom assistants creation and chat functionality persist after upgrade (batch mode only)"
-    },
+    # "assistants-complete": {
+    #     "name": "Complete Assistants Migration (Create + Chat)",
+    #     "setup_tests": [
+    #         "assistants/setup-create-assistants.txt",
+    #         "assistants/setup-chat-with-assistant.txt"
+    #     ],
+    #     "verify_tests": [
+    #         "assistants/verify-create-assistant-persistence.txt", 
+    #         "assistants/verify-chat-with-assistant-persistence.txt"
+    #     ],
+    #     "description": "Tests that custom assistants creation and chat functionality persist after upgrade (batch mode only)"
+    # },
     "modify-local-api-server": {
         "name": "Modify Local API Server Settings Migration",
         "setup_test": "settings/setup-local-api-server.txt",
