@@ -37,6 +37,18 @@ MIGRATION_TEST_CASES = {
         ],
         "description": "Tests that custom assistants creation and chat functionality persist after upgrade (batch mode only)"
     },
+    "modify-local-api-server": {
+        "name": "Modify Local API Server Settings Migration",
+        "setup_test": "settings/setup-local-api-server.txt",
+        "verify_test": "settings/verify-local-api-server-persistence.txt",
+        "description": "Tests that local API server settings (port and API prefix) persist after upgrade"
+    },
+    "modify-https-proxy": {
+        "name": "Modify HTTPS Proxy Settings Migration",
+        "setup_test": "settings/setup-https-proxy.txt",
+        "verify_test": "settings/verify-https-proxy-persistence.txt",
+        "description": "Tests that HTTPS proxy settings persist after upgrade"
+    }
 }
 
 async def run_individual_migration_test(computer, test_case_key, old_version_path, new_version_path, 
