@@ -9,7 +9,7 @@ Before testing, set-up the following in the old version to make sure that we can
 - [x] Ensure there are 2 model downloaded 🔥🔥
 - [x] Ensure there are 2 import on local provider (llama.cpp) 
 - [x] Modify MCP servers list and add some ENV value to MCP servers
-- [x] Modify Local API Server 🔥
+- [x] Modify Local API Server ✅
 - [x] HTTPS proxy config value 🔥
 - [x] Add 2 custom assistants to Jan 🔥🔥
 - [x] Create a new chat with the custom assistant 🔥🔥🔥
