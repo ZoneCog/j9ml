@@ -15,7 +15,7 @@ Before testing, set-up the following in the old version to make sure that we can
 - [x] Create a new chat with the custom assistant 🔥🔥🔥
 - [x] Change the `App Data` to some other folder
 - [x] Create a Custom Provider 🔥🔥 (Not verified yet)
-- [x] Disabled some model providers 🔥🔥🔥
+- [x] Disabled some model providers ✅ (Intermittently work)
 #### Validate that the update does not corrupt existing user data or settings (before and after update show the same information):
 - [x] Threads
 	- [x] Previously used model and assistants is shown correctly
