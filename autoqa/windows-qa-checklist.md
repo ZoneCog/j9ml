@@ -3,7 +3,7 @@
 ## A. Initial update / migration Data check
 
 Before testing, set-up the following in the old version to make sure that we can see the data is properly migrated:
-- [x] Changing appearance / theme to something that is obviously different from default set-up 🔥
+- [x] Changing appearance / theme to something that is obviously different from default set-up ✅
 - [x] Ensure there are a few chat threads 🔥🔥🔥
 - [x] Ensure there are a few favourites / star threads 🔥🔥🔥
 - [x] Ensure there are 2 model downloaded 🔥🔥
