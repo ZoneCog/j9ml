@@ -19,6 +19,18 @@ MIGRATION_TEST_CASES = {
         "verify_test": "models/verify-model-persistence.txt", 
         "description": "Tests that downloaded models persist after upgrade"
     },
+    "appearance_dark-theme": {
+        "name": "Dark Theme Appearance Migration",
+        "setup_test": "appearance/setup-dark-theme-appearance.txt",
+        "verify_test": "appearance/verify-dark-theme-appearance-persistence.txt",
+        "description": "Tests that the Dark theme setting persists after upgrade"
+    },
+    "appearance_light-theme": {
+        "name": "Light Theme Appearance Migration",
+        "setup_test": "appearance/setup-light-theme-appearance.txt",
+        "verify_test": "appearance/verify-light-theme-appearance-persistence.txt",
+        "description": "Tests that the Light theme setting persists after upgrade"
+    },
     "assistants": {
         "name": "Custom Assistants Migration",
         "setup_test": "assistants/setup-create-assistants.txt",
@@ -48,6 +60,12 @@ MIGRATION_TEST_CASES = {
         "setup_test": "settings/setup-https-proxy.txt",
         "verify_test": "settings/verify-https-proxy-persistence.txt",
         "description": "Tests that HTTPS proxy settings persist after upgrade"
+    },
+    "models_disable-model-providers": {
+        "name": "Model Providers Enabled/Disabled State Migration",
+        "setup_test": "models/setup-model-providers.txt",
+        "verify_test": "models/verify-model-providers-persistence.txt",
+        "description": "Ensures enabled/disabled state for providers persists after upgrade (Disabled: Llama.cpp, OpenAI, Anthropic; Enabled: Cohere, OpenRouter, Mistral, Groq, Gemini, Hugging Face)"
     }
 }
 

@@ -28,9 +28,13 @@ call_user() # Submit the task and call the user when the task is unsolvable, or 
 
 ## User Instruction
 
-You are verifying that the Appearance theme persists after upgrading to the NEW version of the Jan application.
+You are verifying that the Model Providers enabled/disabled state persists after upgrading to the NEW version of the Jan application.
 
-PHASE: VERIFY APPEARANCE THEME PERSISTENCE (NEW VERSION)
+PHASE: VERIFY MODEL PROVIDERS PERSISTENCE (NEW VERSION)
+
+Expected persisted state:
+- Disabled: Llama.cpp, OpenAI, Anthropic
+- Enabled: Cohere, OpenRouter, Mistral, Groq, Gemini, Hugging Face
 
 Step-by-step instructions:
 
@@ -38,18 +42,26 @@ Step-by-step instructions:
    - If a dialog appears in the bottom-right corner titled **"Help Us Improve Jan"**, click **Deny** to dismiss it before continuing.
    - If **New Version Available** popup appears on app launch (older versions), click **Remind Me Later** to dismiss it before continuing.
 
-2. Navigate to Appearance settings:
+2. Navigate to Model Providers settings:
    - In the bottom-left menu, click **Settings**.
-   - In the left sidebar, click **Appearance**.
+   - In the left sidebar, click **Model Providers**.
 
-3. Verify theme persistence:
-   - Check the **Theme** field menu and read the current theme value.
-   - Confirm the theme is **Dark**.
+3. Verify provider states:
+   - For each provider in the right panel, read the chip/toggle state and confirm it matches the expected persisted state:
+     - Llama.cpp: disabled
+     - OpenAI: disabled
+     - Anthropic: disabled
+     - Cohere: enabled
+     - OpenRouter: enabled
+     - Mistral: enabled
+     - Groq: enabled
+     - Gemini: enabled
+     - Hugging Face: enabled
 
 4. Return result:
-   - If the current theme is **Dark**, return:
+   - If all providers match the expected states, return:
      {"result": True, "phase": "verification_complete"}
-   - Otherwise, return:
+   - If any provider does not match the expected state, return:
      {"result": False, "phase": "verification_failed"}
 
 CRITICAL INSTRUCTIONS FOR FINAL RESPONSE:

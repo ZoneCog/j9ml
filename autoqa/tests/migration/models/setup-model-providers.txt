@@ -28,9 +28,13 @@ call_user() # Submit the task and call the user when the task is unsolvable, or 
 
 ## User Instruction
 
-You are changing the Appearance theme in the OLD version of the Jan application.
+You are configuring Model Providers in the OLD version of the Jan application to prepare for migration verification.
 
-PHASE: SETUP APPEARANCE THEME (OLD VERSION)
+PHASE: SETUP MODEL PROVIDERS (OLD VERSION)
+
+Desired state:
+- Disabled: Llama.cpp, OpenAI, Anthropic
+- Enabled: Cohere, OpenRouter, Mistral, Groq, Gemini, Hugging Face
 
 Step-by-step instructions:
 
@@ -38,18 +42,26 @@ Step-by-step instructions:
    - If a dialog appears in the bottom-right corner titled **"Help Us Improve Jan"**, click **Deny** to dismiss it before continuing.
    - If **New Version Available** popup appears on app launch (older versions), click **Remind Me Later** to dismiss it before continuing.
 
-2. Navigate to Appearance settings:
+2. Navigate to Model Providers settings:
    - In the bottom-left menu, click **Settings**.
-   - In the left sidebar, click **Appearance**.
+   - In the left sidebar, click **Model Providers**.
 
-3. Change the theme:
-   - In the **Theme** field, click the current theme menu (e.g., **System**, **Light**, or **Dark**).
-   - Select **Dark** (only change if it is not already Dark).
+3. Set provider states:
+   - For each provider in the right panel, use the chip/toggle on the right side of the row to set the desired state:
+     - Llama.cpp: disable (toggle off if enabled), then call `wait()` once
+     - OpenAI: disable (toggle off if enabled), then call `wait()` once
+     - Anthropic: disable (toggle off if enabled), then call `wait()` once
+     - Cohere: enable (toggle on if disabled), then call `wait()` once
+     - OpenRouter: enable (toggle on if disabled), then call `wait()` once
+     - Mistral: enable (toggle on if disabled), then call `wait()` once
+     - Groq: enable (toggle on if disabled), then call `wait()` once
+     - Gemini: enable (toggle on if disabled), then call `wait()` once
+     - Hugging Face: enable (toggle on if disabled), then call `wait()` once
 
 4. Return result:
-   - If the Theme is set to **Dark**, return:
+   - If all providers are set to the desired states (Disabled: Llama.cpp, OpenAI, Anthropic; Enabled: Cohere, OpenRouter, Mistral, Groq, Gemini, Hugging Face), return:
      {"result": True, "phase": "setup_complete"}
-   - If the Theme cannot be set to **Dark**, return:
+   - If any provider cannot be set to the desired state, return:
      {"result": False, "phase": "setup_failed"}
 
 CRITICAL INSTRUCTIONS FOR FINAL RESPONSE:
