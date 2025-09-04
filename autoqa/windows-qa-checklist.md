@@ -61,8 +61,8 @@ Before testing, set-up the following in the old version to make sure that we can
 	- [x] Dark ✅
 	- [x] System (should follow your OS system settings) 🔥🔥🔥
 - [x] Change the following values => close the application => re-open the application => ensure that the change is persisted across session:
-	- [x] Theme 🔥
-	- [x] Font Size 🔥
+	- [x] Theme ✅
+	- [x] Font Size ✅
 	- [x] Window Background 🔥
 	- [x] App Main View 🔥
 	- [x] Primary 🔥

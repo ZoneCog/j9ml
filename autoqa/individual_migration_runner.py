@@ -31,6 +31,12 @@ MIGRATION_TEST_CASES = {
         "verify_test": "appearance/verify-light-theme-appearance-persistence.txt",
         "description": "Tests that the Light theme setting persists after upgrade"
     },
+    "appearance_font-size": {
+        "name": "Font Size Appearance Migration",
+        "setup_test": "appearance/setup-font-size-appearance.txt",
+        "verify_test": "appearance/verify-font-size-appearance-persistence.txt",
+        "description": "Tests that the Font Size setting (Extra Large) persists after upgrade"
+    },
     "assistants": {
         "name": "Custom Assistants Migration",
         "setup_test": "assistants/setup-create-assistants.txt",
