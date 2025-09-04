@@ -57,9 +57,9 @@ Before testing, set-up the following in the old version to make sure that we can
 - [ ] [ENG] Create a folder with un-standard character as title (e.g. Chinese character) => change the `App data` location to that folder => test that model is still able to load and run properly.
 #### In `Appearance`:
 - [x] Toggle between different `Theme` options to check that they change accordingly and that all elements of the UI are legible with the right contrast:
-	- [x] Light 🔥
-	- [x] Dark 🔥
-	- [x] System (should follow your OS system settings) 🔥
+	- [x] Light ✅
+	- [x] Dark ✅
+	- [x] System (should follow your OS system settings) 🔥🔥🔥
 - [x] Change the following values => close the application => re-open the application => ensure that the change is persisted across session:
 	- [x] Theme 🔥
 	- [x] Font Size 🔥
