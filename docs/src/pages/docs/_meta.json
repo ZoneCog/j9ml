@@ -19,6 +19,10 @@
     "title": "EXPLANATION",
     "type": "separator"
   },
+  "architecture": "Technical Architecture",
+  "developer-architecture": "Developer Architecture Guide",
+  "api-architecture": "API Architecture Reference",
+  "infrastructure-architecture": "Infrastructure & Deployment",
   "llama-cpp": "Local AI Engine",
   "model-parameters": "Model Parameters",
 
