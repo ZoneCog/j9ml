@@ -1,0 +1,354 @@
+# Developer Architecture Guide
+
+This guide provides detailed technical information for developers working on Jan's architecture.
+
+## Core Architecture Patterns
+
+### Event-Driven Architecture
+
+Jan uses an event-driven architecture to decouple components and enable reactive updates across the system.
+
+```mermaid
+graph LR
+    subgraph "Event System"
+        EMITTER[Event Emitter<br/>Core Events API]
+        BUS[Event Bus<br/>Message Routing]
+        LISTENERS[Event Listeners<br/>Component Handlers]
+    end
+
+    subgraph "Event Sources"
+        UI_EVENTS[UI Events<br/>User Actions]
+        MODEL_EVENTS[Model Events<br/>Loading, Inference]
+        SYS_EVENTS[System Events<br/>Hardware, File System]
+        EXT_EVENTS[Extension Events<br/>Lifecycle, State]
+    end
+
+    subgraph "Event Consumers"
+        UI_UPDATE[UI Updates<br/>State Refresh]
+        MODEL_MGMT[Model Management<br/>Loading, Caching]
+        EXT_HANDLER[Extension Handlers<br/>Reactive Processing]
+        LOGGING[Logging System<br/>Event Auditing]
+    end
+
+    UI_EVENTS --> EMITTER
+    MODEL_EVENTS --> EMITTER
+    SYS_EVENTS --> EMITTER
+    EXT_EVENTS --> EMITTER
+
+    EMITTER --> BUS
+    BUS --> LISTENERS
+
+    LISTENERS --> UI_UPDATE
+    LISTENERS --> MODEL_MGMT
+    LISTENERS --> EXT_HANDLER
+    LISTENERS --> LOGGING
+
+    classDef eventSystem fill:#e3f2fd
+    classDef eventSource fill:#e8f5e8
+    classDef eventConsumer fill:#fff3e0
+
+    class EMITTER,BUS,LISTENERS eventSystem
+    class UI_EVENTS,MODEL_EVENTS,SYS_EVENTS,EXT_EVENTS eventSource
+    class UI_UPDATE,MODEL_MGMT,EXT_HANDLER,LOGGING eventConsumer
+```
+
+### Dependency Injection Pattern
+
+Jan implements dependency injection to manage service dependencies and enable testability.
+
+```mermaid
+graph TD
+    subgraph "Service Container"
+        CONTAINER[Service Container<br/>Dependency Manager]
+        REGISTRY[Service Registry<br/>Type Registration]
+        RESOLVER[Dependency Resolver<br/>Instance Creation]
+    end
+
+    subgraph "Core Services"
+        FS_SVC[FileSystem Service<br/>File Operations]
+        MODEL_SVC[Model Service<br/>Model Management]
+        CONFIG_SVC[Config Service<br/>Settings Management]
+        EVENT_SVC[Event Service<br/>Event Handling]
+    end
+
+    subgraph "Extension Services"
+        AI_SVC[AI Service<br/>Inference Logic]
+        CHAT_SVC[Chat Service<br/>Conversation Logic]
+        DOWNLOAD_SVC[Download Service<br/>Model Downloads]
+    end
+
+    CONTAINER --> REGISTRY
+    CONTAINER --> RESOLVER
+
+    REGISTRY --> FS_SVC
+    REGISTRY --> MODEL_SVC
+    REGISTRY --> CONFIG_SVC
+    REGISTRY --> EVENT_SVC
+
+    RESOLVER --> AI_SVC
+    RESOLVER --> CHAT_SVC
+    RESOLVER --> DOWNLOAD_SVC
+
+    AI_SVC --> MODEL_SVC
+    CHAT_SVC --> EVENT_SVC
+    DOWNLOAD_SVC --> FS_SVC
+
+    classDef container fill:#e8eaf6
+    classDef coreService fill:#e0f2f1
+    classDef extService fill:#fff8e1
+
+    class CONTAINER,REGISTRY,RESOLVER container
+    class FS_SVC,MODEL_SVC,CONFIG_SVC,EVENT_SVC coreService
+    class AI_SVC,CHAT_SVC,DOWNLOAD_SVC extService
+```
+
+## Inter-Process Communication
+
+Jan uses multiple IPC mechanisms to enable communication between the frontend and backend components.
+
+```mermaid
+sequenceDiagram
+    participant React as React Frontend
+    participant Tauri as Tauri IPC
+    participant Rust as Rust Backend
+    participant Extension as Extension System
+    participant Engine as AI Engine
+
+    Note over React,Engine: Command Pattern IPC
+
+    React->>Tauri: invoke('start_inference')
+    Tauri->>Rust: start_inference_command()
+    Rust->>Extension: route_to_extension()
+    Extension->>Engine: begin_inference()
+    Engine-->>Extension: inference_stream
+    Extension-->>Rust: stream_response()
+    Rust-->>Tauri: emit_event('inference_chunk')
+    Tauri-->>React: listen('inference_chunk')
+
+    Note over React,Engine: Event Pattern IPC
+
+    Engine->>Extension: model_loaded_event
+    Extension->>Rust: emit_global_event()
+    Rust->>Tauri: global_event_emit()
+    Tauri->>React: event_listener()
+    React->>React: update_ui_state()
+
+    Note over React,Engine: Stream Pattern IPC
+
+    React->>Tauri: start_model_download()
+    Tauri->>Rust: download_with_progress()
+    loop Progress Updates
+        Rust-->>Tauri: progress_event(percent)
+        Tauri-->>React: download_progress(percent)
+        React-->>React: update_progress_bar()
+    end
+    Rust-->>Tauri: download_complete()
+    Tauri-->>React: download_finished()
+```
+
+## State Management Architecture
+
+Jan implements a hybrid state management approach combining local component state with global application state.
+
+```mermaid
+graph TB
+    subgraph "State Management Layers"
+        subgraph "Global State"
+            APP_STATE[Application State<br/>Global App Context]
+            MODEL_STATE[Model State<br/>Loaded Models, Status]
+            CONFIG_STATE[Configuration State<br/>User Settings]
+            THREAD_STATE[Thread State<br/>Conversations, Messages]
+        end
+
+        subgraph "Local State"
+            COMP_STATE[Component State<br/>React useState/useReducer]
+            FORM_STATE[Form State<br/>Input Validation]
+            UI_STATE[UI State<br/>Modals, Loading States]
+        end
+
+        subgraph "Derived State"
+            COMPUTED[Computed State<br/>useMemo, selectors]
+            CACHED[Cached State<br/>Query Results]
+        end
+    end
+
+    subgraph "State Persistence"
+        STORAGE[Local Storage<br/>Browser Storage]
+        FILE_STORE[File Store<br/>Configuration Files]
+        MEMORY[Memory Store<br/>Runtime State]
+    end
+
+    subgraph "State Synchronization"
+        TAURI_STORE[Tauri Store<br/>Backend State Sync]
+        EVENT_SYNC[Event Synchronization<br/>State Change Events]
+    end
+
+    APP_STATE --> STORAGE
+    CONFIG_STATE --> FILE_STORE
+    MODEL_STATE --> MEMORY
+    THREAD_STATE --> FILE_STORE
+
+    COMP_STATE --> COMPUTED
+    FORM_STATE --> COMPUTED
+
+    APP_STATE --> TAURI_STORE
+    MODEL_STATE --> TAURI_STORE
+    TAURI_STORE --> EVENT_SYNC
+    EVENT_SYNC --> COMP_STATE
+
+    classDef globalState fill:#e3f2fd
+    classDef localState fill:#e8f5e8
+    classDef derivedState fill:#fff3e0
+    classDef persistence fill:#f3e5f5
+    classDef sync fill:#fce4ec
+
+    class APP_STATE,MODEL_STATE,CONFIG_STATE,THREAD_STATE globalState
+    class COMP_STATE,FORM_STATE,UI_STATE localState
+    class COMPUTED,CACHED derivedState
+    class STORAGE,FILE_STORE,MEMORY persistence
+    class TAURI_STORE,EVENT_SYNC sync
+```
+
+## Security Architecture
+
+Jan implements multiple layers of security to protect user data and ensure safe AI operations.
+
+```mermaid
+graph TD
+    subgraph "Security Layers"
+        subgraph "Application Security"
+            SANDBOX[Tauri Sandbox<br/>Process Isolation]
+            CSP[Content Security Policy<br/>Script Protection]
+            CORS[CORS Policy<br/>Cross-Origin Protection]
+        end
+
+        subgraph "Data Security"
+            ENCRYPTION[Data Encryption<br/>At-Rest Protection]
+            LOCAL_ONLY[Local Processing<br/>No Data Transmission]
+            SECURE_STORE[Secure Storage<br/>Credentials, Keys]
+        end
+
+        subgraph "Runtime Security"
+            INPUT_VAL[Input Validation<br/>Sanitization]
+            RESOURCE_LIMIT[Resource Limits<br/>Memory, CPU Protection]
+            ERROR_HANDLING[Error Handling<br/>Safe Failure]
+        end
+    end
+
+    subgraph "Threat Mitigation"
+        MODEL_VAL[Model Validation<br/>Safe Model Loading]
+        EXT_ISOLATION[Extension Isolation<br/>Sandboxed Extensions]
+        FILE_ACCESS[File Access Control<br/>Permission Management]
+    end
+
+    subgraph "Privacy Protection"
+        NO_TELEMETRY[No Telemetry<br/>Zero Data Collection]
+        USER_CONTROL[User Control<br/>Full Data Ownership]
+        OFFLINE_FIRST[Offline First<br/>Local-Only Operation]
+    end
+
+    SANDBOX --> MODEL_VAL
+    CSP --> INPUT_VAL
+    CORS --> EXT_ISOLATION
+    
+    ENCRYPTION --> SECURE_STORE
+    LOCAL_ONLY --> NO_TELEMETRY
+    
+    RESOURCE_LIMIT --> FILE_ACCESS
+    ERROR_HANDLING --> USER_CONTROL
+    
+    NO_TELEMETRY --> OFFLINE_FIRST
+
+    classDef appSecurity fill:#e3f2fd
+    classDef dataSecurity fill:#e8f5e8
+    classDef runtimeSecurity fill:#fff3e0
+    classDef threatMitigation fill:#f3e5f5
+    classDef privacy fill:#fce4ec
+
+    class SANDBOX,CSP,CORS appSecurity
+    class ENCRYPTION,LOCAL_ONLY,SECURE_STORE dataSecurity
+    class INPUT_VAL,RESOURCE_LIMIT,ERROR_HANDLING runtimeSecurity
+    class MODEL_VAL,EXT_ISOLATION,FILE_ACCESS threatMitigation
+    class NO_TELEMETRY,USER_CONTROL,OFFLINE_FIRST privacy
+```
+
+## Performance Architecture
+
+Jan is designed for optimal performance across different hardware configurations.
+
+```mermaid
+graph TB
+    subgraph "Performance Optimization"
+        subgraph "Model Performance"
+            MODEL_CACHE[Model Caching<br/>Memory Management]
+            QUANTIZATION[Model Quantization<br/>Size/Speed Tradeoffs]
+            BATCH_PROC[Batch Processing<br/>Efficient Inference]
+        end
+
+        subgraph "UI Performance"
+            VIRTUAL_LIST[Virtual Lists<br/>Large Dataset Rendering]
+            LAZY_LOAD[Lazy Loading<br/>On-Demand Components]
+            MEMOIZATION[Memoization<br/>Expensive Computation Caching]
+        end
+
+        subgraph "System Performance"
+            WORKER_THREADS[Worker Threads<br/>Non-Blocking Operations]
+            RESOURCE_POOL[Resource Pooling<br/>Connection Management]
+            ASYNC_OPS[Async Operations<br/>Non-Blocking I/O]
+        end
+    end
+
+    subgraph "Performance Monitoring"
+        METRICS[Performance Metrics<br/>Real-time Monitoring]
+        PROFILING[Performance Profiling<br/>Bottleneck Detection]
+        OPTIMIZATION[Auto Optimization<br/>Adaptive Settings]
+    end
+
+    MODEL_CACHE --> METRICS
+    QUANTIZATION --> PROFILING
+    BATCH_PROC --> OPTIMIZATION
+
+    VIRTUAL_LIST --> METRICS
+    LAZY_LOAD --> PROFILING
+    MEMOIZATION --> OPTIMIZATION
+
+    WORKER_THREADS --> METRICS
+    RESOURCE_POOL --> PROFILING
+    ASYNC_OPS --> OPTIMIZATION
+
+    classDef modelPerf fill:#e3f2fd
+    classDef uiPerf fill:#e8f5e8
+    classDef systemPerf fill:#fff3e0
+    classDef monitoring fill:#f3e5f5
+
+    class MODEL_CACHE,QUANTIZATION,BATCH_PROC modelPerf
+    class VIRTUAL_LIST,LAZY_LOAD,MEMOIZATION uiPerf
+    class WORKER_THREADS,RESOURCE_POOL,ASYNC_OPS systemPerf
+    class METRICS,PROFILING,OPTIMIZATION monitoring
+```
+
+## Development Guidelines
+
+### Architecture Principles
+
+1. **Modularity**: Design components with clear boundaries and minimal coupling
+2. **Testability**: Structure code to enable comprehensive unit and integration testing
+3. **Performance**: Optimize for local hardware constraints and resource usage
+4. **Security**: Implement defense-in-depth security practices
+5. **Maintainability**: Write clean, documented code following established patterns
+
+### Component Design Patterns
+
+1. **Composition over Inheritance**: Prefer composition for flexible, reusable components
+2. **Dependency Injection**: Use DI for managing service dependencies
+3. **Event-Driven Updates**: Leverage events for reactive system updates
+4. **Immutable State**: Maintain immutable state for predictable updates
+5. **Error Boundaries**: Implement proper error handling and recovery
+
+### Extension Development
+
+1. **Well-Defined APIs**: Use typed interfaces for extension communication
+2. **Lifecycle Management**: Proper initialization and cleanup in extensions
+3. **Resource Management**: Efficient use of system resources
+4. **Error Handling**: Graceful degradation and error recovery
+5. **Documentation**: Comprehensive documentation for extension APIs
